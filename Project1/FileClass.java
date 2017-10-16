@@ -6,10 +6,13 @@ import java.lang.*;
 
 class FileClass{
     public static File fileExists(String filePath){
+        final String textExt = "txt";
         File file = new File(filePath);
         if(file.exists()){
             if(file.isFile()){
-                return file;
+                if(filePath.endsWith(".txt")){
+                    return file;
+                }
             }
         }
         return null;

@@ -17,11 +17,13 @@ public class FTPServer{
             System.out.println("Cannot connect to port");
             System.exit(1);
         }
+        int clientNumber = 0;
         do{            
             Socket clientSocket = serverSocket.accept();
-            System.out.println("New client connected");
-            ClientHandler clientHandler = new ClientHandler(clientSocket);
-            clientHandler.start(); 
+            clientNumber++; 
+            System.out.println("Client " + clientNumber + " connected");
+            ClientHandler clientHandler = new ClientHandler(clientSocket, clientNumber);
+            clientHandler.start();
         }while(true);
     }
 }
@@ -29,14 +31,16 @@ public class FTPServer{
 class ClientHandler extends Thread{
     private Socket connectionSocket; 
     private BufferedReader inFromClient;
+    private int clientNumber;
     //private DataOutputStream outToClient;
     private static final String FILE_DIRECTORY = "serverFiles";
     private static final String EOF = "eof";
     private static final String FILE_FOUND = "200";
     private static final String FILE_NOT_FOUND = "550";
 
-    public ClientHandler(Socket connectionSocket){
+    public ClientHandler(Socket connectionSocket, int clientNumber){
         this.connectionSocket = connectionSocket;
+        this.clientNumber = clientNumber;
         try{
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             //outToClient = new DataOutputStream(connectionSocket.getOutputStream());
@@ -49,11 +53,14 @@ class ClientHandler extends Thread{
         do{
             try{
                 String[] tokens = inFromClient.readLine().split("\\s");
-                String ipAddress = connectionSocket.getInetAddress().getHostAddress();
-                int port = Integer.parseInt(tokens[0]);
-                Socket dataSocket = new Socket(ipAddress, port);
-                DataOutputStream dataToClient = new DataOutputStream(dataSocket.getOutputStream());    
                 if(tokens.length >= 2){
+
+                    //Set up data connection
+                    String ipAddress = connectionSocket.getInetAddress().getHostAddress();
+                    int port = Integer.parseInt(tokens[0]);
+                    Socket dataSocket = new Socket(ipAddress, port);
+                    DataOutputStream dataToClient = new DataOutputStream(dataSocket.getOutputStream());    
+                    
                     if(tokens[1].equals("list:")){
                         File folder = new File(FILE_DIRECTORY);
                         for(File file : folder.listFiles()){
@@ -74,40 +81,47 @@ class ClientHandler extends Thread{
                             fileReader.close();
                         }
                         else{
-                            System.out.println(FILE_NOT_FOUND + '\n');
+                            dataToClient.writeBytes(FILE_NOT_FOUND + '\n');
                         }
                     }
                     else if(tokens[1].equals("stor:")){
-                        //Checks if the file already exists
                         String filePath = FILE_DIRECTORY + "/" + tokens[2];
+                        BufferedReader dataFromClient = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+                        //File does not exist on file server
                         if(FileClass.fileExists(filePath) == null){
-                            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath));
-                            BufferedReader dataFromClient = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
-                            String fileLine;
-                            while(!(fileLine = dataFromClient.readLine()).equals(EOF)){
-                                fileWriter.write(fileLine + '\n');
+                            String fileLine;    
+                            //File exists on the client side
+                            if((fileLine = dataFromClient.readLine()).equals(FILE_FOUND)){
+                                BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath));
+                                while(!(fileLine = dataFromClient.readLine()).equals(EOF)){
+                                    fileWriter.write(fileLine + '\n');
+                                }
+                                fileWriter.close();
+                                System.out.println("File stored!");
                             }
-                            fileWriter.close();
+                            else{
+                                System.out.println("File not stored!");
+                            }
                         }
+                        dataFromClient.close();
                     }
+                    dataSocket.close();
+                    dataToClient.close();
                 }
-                else if(tokens[1].equals("quit")){
+                else if(tokens[0].equals("quit")){
+
                     cont = false;
                 }
-                dataSocket.close();
-                dataToClient.close();
             }
             catch(IOException ex){
             }
         }while(cont);
         try{
+            System.out.println("Client " + clientNumber + " disconnected");
             connectionSocket.close();
         }
         catch(IOException ex){
             System.out.println("Unable to disconnect: (IO EX: " + ex + ")");
         }
     }
-
-
-
 }
