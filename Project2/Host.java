@@ -14,6 +14,7 @@ public class Host{
     private Socket socket;
     private DataOutputStream outToServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
+    private final String FILE_DIRECTORY = "hostFiles/";
 
     //Create a connection to server
     public void connectToServer(String serverIP, int serverPort){
@@ -40,15 +41,22 @@ public class Host{
         }
     }
 
-    //Create a JSON file made of three fields
-    public void uploadFile(String userName, String hostName, String connSpeed){
-        JSONObject obj = new JSONObject();
-        obj.put("userName", userName);
-        obj.put("num", hostName);
-        obj.put("balance", connSpeed);
+    //Upload file to current directory with file info
+    public void uploadFile(){
         try{
+            JSONObject obj1 = new JSONObject();
+            JSONArray arr1 = new JSONArray();
+            File folder = new File(FILE_DIRECTORY);
+            
+            for(File file : folder.listFiles()){
+                JSONObject obj2 = new JSONObject();
+                obj2.put("Filename", file.getName());
+                obj2.put("Description", "some description here");
+                arr1.add(obj2);                    
+            }
+            obj1.put("Files", arr1);
             FileWriter file = new FileWriter(JSON_FILE_NAME);
-            file.write(obj.toJSONString());
+            file.write(obj1.toJSONString());
             file.close();
         }
         catch(IOException ex){
@@ -61,7 +69,7 @@ public class Host{
     /////////
     public static void main(String args[]){
         Host h = new Host();
-        h.uploadFile("userName", "127.0.0.1", "Ethernet");
+        h.uploadFile();
 
     }
 }
