@@ -2,5 +2,5 @@
 ## To compile and run from command line (ignore notes on unchecked/unsafe operations):
 `javac -cp json.jar Host.java`
 
-`java -cp  ";json.jar Host"`
+`java -cp  ";json.jar" Host`
 
