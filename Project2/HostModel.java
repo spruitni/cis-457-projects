@@ -67,9 +67,10 @@ public class Host{
     /////////
     //TESTING
     /////////
-    public static void main(String args[]){
+    public static void main(String[] args){
         Host h = new Host();
         h.uploadFile();
+        
 
     }
 }
