@@ -1,6 +1,12 @@
 # Source code for project 2
-## To compile and run from command line (ignore notes on unchecked/unsafe operations):
-`javac -cp json.jar Host.java`
+## To compile... (ignore notes on unchecked/unsafe operations):
+`javac -cp json.jar HostModel.java` (to run just the host ``)
 
-`java -cp  ";json.jar" Host`
+`javac HostView.java`
 
+`javac HostController.java`
+
+`javac CentralServer.java`
+
+## To run...
+`java HostController`
