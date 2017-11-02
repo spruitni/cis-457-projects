@@ -7,12 +7,13 @@ public class HostView extends JFrame{
     private JTextField serverName, port;
     private JPanel topPanel;
 
+    //Create GUI
     public HostView(){
         this.setTitle("GV-Napster Host");
         this.setLayout(new GridLayout(3,1)); 
         this.setSize(900,900);
         this.getContentPane();   
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.topPanel = new JPanel(new GridLayout(0, 6, 10, 10));
         this.serverName = new JTextField();
         this.port = new JTextField();
@@ -24,18 +25,18 @@ public class HostView extends JFrame{
         this.setVisible(true);
     }
 
-    
+    //Get connect button
     public JButton getConnectButton(){
         return connectButton;
     }
+
+    //Get server name (IP address)
     public String getServerName(){
         return serverName.getText();
     }
-    public String getPort(){
-        return port.getText();
-    }
-    public void setText(String text){
-        this.serverName.setText(text);
-    }
 
+    //Get port number as integer
+    public int getPort(){
+        return Integer.parseInt(port.getText());
+    }
 }

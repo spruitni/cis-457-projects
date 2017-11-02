@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
 //Class performs host functions
-public class Host{
+public class HostModel{
 
     //Class attributes
     private final String EOF = "EOF";
@@ -16,24 +16,28 @@ public class Host{
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "hostFiles/";
 
+
+
     //Create a connection to server
     public void connectToServer(String serverIP, int serverPort){
         try{
-            socket = new Socket(serverIP, serverPort);
+            this.socket = new Socket(serverIP, serverPort);
         }
         catch(IOException ex){
             System.out.println("Problem connecting to server");
         }
     }
 
-    //Send data to server (such as username, hostname, conn. speed)
-    public void sendData(String[] data){
+    //Send message to server
+    public void sendMessage(String message){
         try{
             outToServer = new DataOutputStream(socket.getOutputStream());
-            for(String line : data){
-                outToServer.writeBytes(line + '\n');
+            outToServer.writeBytes(message + '\n');
+            
+            //Close connection
+            if(message.equals("quit")){
+                socket.close();
             }
-            outToServer.writeBytes(EOF + '\n');
             outToServer.close();
         }
         catch(IOException ex){
@@ -63,7 +67,7 @@ public class Host{
             System.out.println("Problem writing JSON file: " + ex);
         }
     }    
-
+    /*
     /////////
     //TESTING
     /////////
@@ -73,4 +77,5 @@ public class Host{
         
 
     }
+    */
 }
