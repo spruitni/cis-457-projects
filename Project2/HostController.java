@@ -32,8 +32,8 @@ public class HostController{
         //Listen for window close, then close connection
         windowListener = new WindowListener(){
             public void windowClosing(WindowEvent event){
+                hostView.dispose();
                 hostModel.sendMessage("quit");
-                System.out.println("quit");
             }
             
             //Not really needed, but abstract interface methods need be overridden

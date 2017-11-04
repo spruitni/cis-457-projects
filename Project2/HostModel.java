@@ -67,15 +67,4 @@ public class HostModel{
             System.out.println("Problem writing JSON file: " + ex);
         }
     }    
-    /*
-    /////////
-    //TESTING
-    /////////
-    public static void main(String[] args){
-        Host h = new Host();
-        h.uploadFile();
-        
-
-    }
-    */
 }
