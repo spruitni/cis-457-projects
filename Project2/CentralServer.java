@@ -4,12 +4,20 @@ import java.util.*;
 import java.text.*;
 import java.lang.*;
 
+
 public class CentralServer{
 
     //Connection port and  server socket
     private static final int CONN_PORT = 7171;
     private static ServerSocket serverSocket = null;
+
+    
+    
     public static void main(String args[]) throws IOException{
+        
+        //"Users" and "files" table
+        ArrayList<String[]> users;
+        ArrayList<String[]> files;
 
         //Create server socket on port 7171
         try{
@@ -19,6 +27,10 @@ public class CentralServer{
             System.out.println("Cannot connect to port");
             System.exit(1);
         }
+
+        //Create users and files tables 
+        users = new ArrayList<String[]>();
+        files = new ArrayList<String[]>();
 
         //Continuously listen for client connections
         int clientNumber = 0;
@@ -60,9 +72,14 @@ class ClientHandler extends Thread{
         //Continue logic until client closes connection
         boolean cont = true;
         do{
+            String message;
             try{
-                if(inFromClient.readLine().equals("quit")){
+                if((message = inFromClient.readLine()).equals("quit")){
                     cont = false;
+                }
+                else{
+                    //String[] messageParts = message.split("\\s");
+                    System.out.println(message);    
                 }
             }
             catch(IOException ex){

@@ -9,5 +9,12 @@
 
 `javac CentralServer.java`
 
+and
+
+`javac CentralServer.java`
+
 ## To run...
+`java CentralServer`
+
 `java HostController`
+

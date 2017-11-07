@@ -22,9 +22,19 @@ public class HostController{
         actionListener = new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 
-                //Control connection to server
+                //Connect to server, send messge
                 if(event.getSource() == hostView.getConnectButton()){
                     hostModel.connectToServer(hostView.getServerName(), hostView.getPort());
+                    String username = hostView.getUserName();
+                    String hostname = hostView.getHostName();
+                    String speed = hostView.getSpeed();
+                    hostModel.sendMessage(username + " " + hostname + " " + speed);
+                    System.out.println("Sent message");
+                }
+
+                
+                //Search
+                if(event.getSource() == hostView.getSearchButton()){
                 }
             }
         };
@@ -33,7 +43,12 @@ public class HostController{
         windowListener = new WindowListener(){
             public void windowClosing(WindowEvent event){
                 hostView.dispose();
-                hostModel.sendMessage("quit");
+                try{
+                    hostModel.sendMessage("quit\n");
+                }
+                catch(NullPointerException ex){
+                    System.out.println("Problem disconnecting from central server: " + ex);
+                }
             }
             
             //Not really needed, but abstract interface methods need be overridden

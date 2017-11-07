@@ -28,17 +28,17 @@ public class HostModel{
         }
     }
 
-    //Send message to server
+    //Send message to server (username, hostname, speed)
     public void sendMessage(String message){
         try{
             outToServer = new DataOutputStream(socket.getOutputStream());
             outToServer.writeBytes(message + '\n');
-            
+            System.out.println("Here");
             //Close connection
             if(message.equals("quit")){
                 socket.close();
             }
-            outToServer.close();
+            //outToServer.close();
         }
         catch(IOException ex){
             System.out.println("Problem writing to server" + ex);
