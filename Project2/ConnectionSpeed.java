@@ -1,3 +1,3 @@
 public enum ConnectionSpeed{
-    T1, T2, ETHERNET;
+    MODEM, ETHERNET, T1, T3;
 }
