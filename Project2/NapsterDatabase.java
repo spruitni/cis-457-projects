@@ -12,7 +12,16 @@ public class NapsterDatabase{
     }
 
     //Add user to the "users" table
-    public static void AddUsers(String[] userInfo){
+    public static void addUser(String[] userInfo){
         users.add(userInfo);
+    }
+
+    //Testing only
+    public static void printUsers(){
+        for(String[] user : users){
+            for(String userPart: user){
+                System.out.println(userPart);
+            }
+        }
     }
 }
