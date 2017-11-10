@@ -84,7 +84,6 @@ public class HostView extends JFrame{
         this.setVisible(true);
     }
     
-
     //Creates GridBagConstraints 
     private GridBagConstraints getGBC(int x, int y, int w, int h, boolean fillHor, boolean fillVer){
         GridBagConstraints gbc = new GridBagConstraints();
@@ -98,10 +97,10 @@ public class HostView extends JFrame{
         if(fillVer){
             gbc.fill = GridBagConstraints.VERTICAL;
         }
-        //Margin around each item
+
+        //Margin around each component
         gbc.insets = new Insets(5, 5, 5, 5);
         return gbc;
-
     }
 
     //Get button values

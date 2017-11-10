@@ -16,8 +16,6 @@ public class HostModel{
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "hostFiles/";
 
-
-
     //Create a connection to server
     public void connectToServer(String serverIP, int serverPort){
         try{
@@ -34,11 +32,9 @@ public class HostModel{
             outToServer = new DataOutputStream(socket.getOutputStream());
             outToServer.writeBytes(message + '\n');
             System.out.println("Here");
-            //Close connection
             if(message.equals("quit")){
                 socket.close();
             }
-            //outToServer.close();
         }
         catch(IOException ex){
             System.out.println("Problem writing to server" + ex);

@@ -29,10 +29,9 @@ public class HostController{
                     String hostname = hostView.getHostName();
                     String speed = hostView.getSpeed();
                     hostModel.sendMessage(username + " " + hostname + " " + speed);
-                    System.out.println("Sent message");
+                    System.out.println("Sent user info to central server");
                 }
 
-                
                 //Search
                 if(event.getSource() == hostView.getSearchButton()){
                 }
@@ -66,6 +65,8 @@ public class HostController{
         hostView.getConnectButton().addActionListener(actionListener);
         hostView.addWindowListener(windowListener);
     }
+
+    //Start Host GUI
     public static void main(String[] args){
         HostController hc = new HostController(new HostModel(), new HostView());
         hc.control();

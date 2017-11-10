@@ -71,8 +71,8 @@ class ClientHandler extends Thread{
                 }
                 else{
                     String[] messageParts = message.split("\\s");
-                    NapsterDatabase.AddUsers(messageParts);
-                    System.out.println("User " + messageParts[0] + " has joined");    
+                    NapsterDatabase.addUser(messageParts);
+                    NapsterDatabase.printUsers();   
                 }
             }
             catch(IOException ex){
