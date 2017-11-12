@@ -55,6 +55,7 @@ class ClientHandler extends Thread{
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         }
         catch(IOException ex){
+            System.out.println("Problem creating input/output streams: " + ex);
         }
     }
 
@@ -72,7 +73,6 @@ class ClientHandler extends Thread{
                 else{
                     String[] messageParts = message.split("\\s");
                     NapsterDatabase.addUser(messageParts);
-                    NapsterDatabase.printUsers();   
                 }
             }
             catch(IOException ex){

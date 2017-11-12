@@ -30,6 +30,7 @@ public class HostController{
                     String speed = hostView.getSpeed();
                     hostModel.sendMessage(username + " " + hostname + " " + speed);
                     System.out.println("Sent user info to central server");
+                    hostModel.uploadFile();
                 }
 
                 //Search

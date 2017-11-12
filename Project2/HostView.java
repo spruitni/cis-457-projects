@@ -9,9 +9,11 @@ import java.awt.Insets;
 
 public class HostView extends JFrame{
     
-    private JLabel serverLabel, portLabel, userLabel, hostLabel, speedLabel, keywordLabel;
-    private JTextField serverName, port, userName, hostName, keyword;
-    private JButton connectButton, searchButton;
+    private JLabel serverLabel, portLabel, userLabel, hostLabel, speedLabel, keywordLabel, commandLabel;
+    private JTextField serverName, port, userName, hostName, keyword, command;
+    private JScrollPane scroll;
+    private JTextArea commandWindow;
+    private JButton connectButton, searchButton, goButton;
     private JComboBox speed;
     private JPanel mainPanel, topPanel, middlePanel, bottomPanel;
 
@@ -30,13 +32,18 @@ public class HostView extends JFrame{
         hostLabel = new JLabel("Host Name: ");
         speedLabel = new JLabel("Speed: ");
         keywordLabel = new JLabel("Keyword: ");
+        commandLabel = new JLabel("Enter Command: ");
         serverName = new JTextField();
         port = new JTextField();
         userName = new JTextField();
         hostName = new JTextField();
         keyword = new JTextField();
+        command = new JTextField();
+        commandWindow = new JTextArea();
+        scroll = new JScrollPane(commandWindow);
         connectButton = new JButton("Connect");
         searchButton = new JButton("Search");
+        goButton = new JButton("Go");
 
         speed = new JComboBox<>(ConnectionSpeed.values());
         
@@ -46,6 +53,8 @@ public class HostView extends JFrame{
         userName.setPreferredSize(new Dimension(150,30));
         hostName.setPreferredSize(new Dimension(150,30));
         keyword.setPreferredSize(new Dimension(150,30));
+        command.setPreferredSize(new Dimension(150,30));
+        commandWindow.setPreferredSize(new Dimension(300, 100));
 
         //Add title borders
         topPanel.setBorder(new TitledBorder("Connection"));
@@ -70,6 +79,12 @@ public class HostView extends JFrame{
         middlePanel.add(keyword, getGBC(2,0,2,1,true,false));
         middlePanel.add(searchButton, getGBC(4,0,2,1,true,false));
 
+        //Add components to bottom panel
+        bottomPanel.add(commandLabel, getGBC(0,0,2,1,true,false));
+        bottomPanel.add(command, getGBC(2,0,2,1,true,false));
+        bottomPanel.add(goButton, getGBC(4,0,2,1,true,false));
+        bottomPanel.add(scroll, getGBC(0,1,6,4, true, true));
+        
         //Add sub-panels to main panel
         mainPanel.add(topPanel);
         mainPanel.add(middlePanel);
