@@ -15,7 +15,7 @@ public class HostModel{
     private DataOutputStream outToServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "hostFiles/";
-
+    
     //Create a connection to server
     public void connectToServer(String serverIP, int serverPort){
         try{
@@ -31,7 +31,6 @@ public class HostModel{
         try{
             outToServer = new DataOutputStream(socket.getOutputStream());
             outToServer.writeBytes(message + '\n');
-            System.out.println("Here");
             if(message.equals("quit")){
                 socket.close();
             }
@@ -42,16 +41,17 @@ public class HostModel{
     }
 
     //Upload file to current directory with file info
-    public void uploadFile(){
+    public void uploadFile(String username){
         try{
             JSONObject obj1 = new JSONObject();
             JSONArray arr1 = new JSONArray();
-            File folder = new File(FILE_DIRECTORY);
+            File folder = new File(username + "Files");
             
             for(File file : folder.listFiles()){
                 JSONObject obj2 = new JSONObject();
+                obj2.put("Username", username);
                 obj2.put("Filename", file.getName());
-                obj2.put("Description", "some description here");
+                obj2.put("Description", "some description here"); //WHERE DO THE DESCRIPTIONS COME FROM???
                 arr1.add(obj2);                    
             }
             obj1.put("Files", arr1);
@@ -62,6 +62,6 @@ public class HostModel{
         catch(IOException ex){
             System.out.println("Problem writing JSON file: " + ex);
         }
-    }    
+    }
 }
 

@@ -16,5 +16,5 @@ and
 ## To run...
 `java CentralServer`
 
-`java HostController`
+`javac -cp ";json.jar" HostController`
 
