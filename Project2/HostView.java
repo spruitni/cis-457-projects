@@ -9,8 +9,9 @@ import java.awt.Insets;
 
 public class HostView extends JFrame{
     
-    private JLabel serverLabel, portLabel, userLabel, hostLabel, speedLabel, keywordLabel, commandLabel;
-    private JTextField serverName, port, userName, hostName, keyword, command;
+    private JLabel serverLabel, portLabel, userLabel, hostLabel, 
+            hostPortLabel, speedLabel, keywordLabel, commandLabel;
+    private JTextField serverName, port, userName, hostName, hostPort, keyword, command;
     private JScrollPane scroll;
     private JTextArea commandWindow;
     private JButton connectButton, searchButton, goButton;
@@ -30,6 +31,7 @@ public class HostView extends JFrame{
         portLabel = new JLabel("Port: ");
         userLabel = new JLabel("User Name: ");
         hostLabel = new JLabel("Host Name: ");
+        hostPortLabel = new JLabel("Host Port: ");
         speedLabel = new JLabel("Speed: ");
         keywordLabel = new JLabel("Keyword: ");
         commandLabel = new JLabel("Enter Command: ");
@@ -37,6 +39,7 @@ public class HostView extends JFrame{
         port = new JTextField();
         userName = new JTextField();
         hostName = new JTextField();
+        hostPort = new JTextField();
         keyword = new JTextField();
         command = new JTextField();
         commandWindow = new JTextArea();
@@ -47,14 +50,17 @@ public class HostView extends JFrame{
 
         speed = new JComboBox<>(ConnectionSpeed.values());
         
-        //Set component sizes
+        //Set component details
         serverName.setPreferredSize(new Dimension(150,30));
         port.setPreferredSize(new Dimension(150,30));
         userName.setPreferredSize(new Dimension(150,30));
         hostName.setPreferredSize(new Dimension(150,30));
+        hostPort.setPreferredSize(new Dimension(150,30));
         keyword.setPreferredSize(new Dimension(150,30));
         command.setPreferredSize(new Dimension(150,30));
         commandWindow.setPreferredSize(new Dimension(300, 100));
+        searchButton.setEnabled(false);
+        goButton.setEnabled(false);
 
         //Add title borders
         topPanel.setBorder(new TitledBorder("Connection"));
@@ -66,13 +72,15 @@ public class HostView extends JFrame{
         topPanel.add(serverName, getGBC(1,0,1,1,false,false));
         topPanel.add(portLabel, getGBC(2,0,1,1,false,false));
         topPanel.add(port, getGBC(3,0,1,1,false,false));
-        topPanel.add(connectButton, getGBC(4,0,2,1,true,false));
+        topPanel.add(connectButton, getGBC(4,0,4,1,true,false));
         topPanel.add(userLabel, getGBC(0,1,1,1,false,false));
         topPanel.add(userName, getGBC(1,1,1,1,false,false));
         topPanel.add(hostLabel, getGBC(2,1,1,1,false,false));
         topPanel.add(hostName, getGBC(3,1,1,1,false,false));
-        topPanel.add(speedLabel, getGBC(4,1,1,1,false,false));
-        topPanel.add(speed, getGBC(5,1,1,1,false,false));
+        topPanel.add(hostPortLabel, getGBC(4,1,1,1,false,false));
+        topPanel.add(hostPort, getGBC(5,1,1,1,false,false));
+        topPanel.add(speedLabel, getGBC(6,1,1,1,false,false));
+        topPanel.add(speed, getGBC(7,1,1,1,false,false));
 
         //Add components to the middle panel
         middlePanel.add(keywordLabel, getGBC(0,0,2,1,true,false));
@@ -146,10 +154,13 @@ public class HostView extends JFrame{
         return hostName.getText();
     }
 
+    //Get host port number as integer
+    public int getHostPort(){
+        return Integer.parseInt(hostPort.getText());
+    }
+
     //Get selected speed
     public String getSpeed(){
         return speed.getSelectedItem().toString();
     }
-
-
 }

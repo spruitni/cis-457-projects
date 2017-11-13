@@ -71,8 +71,7 @@ class ClientHandler extends Thread{
                     cont = false;
                 }
                 else{
-                    String[] messageParts = message.split("\\s");
-                    NapsterDatabase.addUser(messageParts);
+                    NapsterDatabase.addUser(message);
                 }
             }
             catch(IOException ex){

@@ -10,9 +10,8 @@ public class HostController{
     private ActionListener actionListener;
     private WindowListener windowListener;
 
-    public HostController(HostModel hostModel, HostView hostView){
-        this.hostModel = hostModel;
-        this.hostView = hostView;
+    public HostController(){
+        this.hostView = new HostView();
     }
 
     //Listens for GUI events
@@ -22,15 +21,24 @@ public class HostController{
         actionListener = new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 
-                //Connect to server, send messge
+                //CONNECT BUTTON IS CLICKED - Connect to server, send user info and file info
                 if(event.getSource() == hostView.getConnectButton()){
+
+                    //This host's files will be in a directory that is named the username
+                    //This is done so that when the host uploads the file info, it knows what files to upload
+                    hostModel = new HostModel();
                     hostModel.connectToServer(hostView.getServerName(), hostView.getPort());
                     String username = hostView.getUserName();
                     String hostname = hostView.getHostName();
+                    int hostPort = hostView.getHostPort();
                     String speed = hostView.getSpeed();
-                    hostModel.sendMessage(username + " " + hostname + " " + speed);
+                    hostModel.sendMessage(username + " " + hostname + " " + hostPort + " " + speed);
                     System.out.println("Sent user info to central server");
-                    hostModel.uploadFile();
+                    hostModel.uploadFile(username);
+                    System.out.println("Sent file info to central server");
+
+                    //Host is now allowed to do keyword searches, enable search button
+                    hostView.getSearchButton().setEnabled(true);
                 }
 
                 //Search
@@ -69,7 +77,7 @@ public class HostController{
 
     //Start Host GUI
     public static void main(String[] args){
-        HostController hc = new HostController(new HostModel(), new HostView());
+        HostController hc = new HostController();
         hc.control();
     }
 
