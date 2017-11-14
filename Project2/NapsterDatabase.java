@@ -1,9 +1,15 @@
 import java.util.*;
+import java.io.*; 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 //The Napster "Database" which stores records in an arraylist
 public class NapsterDatabase{
 
     //Database is made of tables for users and files
+    static String jsonFile = "fileInfo.json";
     static ArrayList<String> users;
     static ArrayList<String> files;
     public NapsterDatabase(){
@@ -23,14 +29,32 @@ public class NapsterDatabase{
     }
 
     //Add file information to the "files" table
-    public static void addFileInfo(String fileInfo){
-        if(files.contains(fileInfo)){
-            System.out.println("File info alread exists in the database");
+    public static void addFileInfo(){
+        try{
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(new FileReader(jsonFile));
+            JSONObject jsonObject = (JSONObject)parser.parse(new FileReader(jsonFile));
+            System.out.println(jsonObject);
+            
+
+
+
+            /*
+            if(files.contains(fileInfo)){
+                System.out.println("File info already exists in the database");
+            }
+            else{
+                files.add(fileInfo);
+            }
+            printFiles();  */  
         }
-        else{
-            files.add(fileInfo);
+        catch(ParseException ex){
+            System.out.println("Problem parsing JSON");
         }
-        printFiles();    
+        catch(IOException ex){
+            System.out.println("Problem writing file info");
+        }
+
     }
 
     //Testing only - display all users and files in database

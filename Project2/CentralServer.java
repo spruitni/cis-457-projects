@@ -44,6 +44,7 @@ class ClientHandler extends Thread{
     private Socket connectionSocket; 
     private BufferedReader inFromClient;
     private int clientNumber;
+    private static final String jsonFile = "fileInfo.json";
 
     //Creates client
     public ClientHandler(Socket connectionSocket, int clientNumber){
@@ -72,6 +73,7 @@ class ClientHandler extends Thread{
                 }
                 else{
                     NapsterDatabase.addUser(message);
+                    NapsterDatabase.addFileInfo();
                 }
             }
             catch(IOException ex){

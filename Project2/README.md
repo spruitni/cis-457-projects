@@ -13,8 +13,8 @@ and
 
 `javac CentralServer.java`
 
-## To run...
-`java CentralServer`
+## To run you must specify the classpath for the JSON jar file 
+`javac -cp ";json.jar" CentralServer`
 
 `javac -cp ";json.jar" HostController`
 
