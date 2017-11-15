@@ -32,27 +32,29 @@ public class NapsterDatabase{
     public static void addFileInfo(){
         try{
             JSONParser parser = new JSONParser();
-            Object obj = parser.parse(new FileReader(jsonFile));
-            JSONObject jsonObject = (JSONObject)parser.parse(new FileReader(jsonFile));
-            System.out.println(jsonObject);
-            
-
-
-
-            /*
-            if(files.contains(fileInfo)){
-                System.out.println("File info already exists in the database");
+            JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(jsonFile));
+            JSONArray filesArray = (JSONArray) jsonObject.get("Files");
+            Iterator<JSONObject> iterator = filesArray.iterator();
+            while (iterator.hasNext()){
+                JSONObject jsonObject2 = iterator.next(); 
+                String desc = (String) jsonObject2.get("Description");
+                String username = (String) jsonObject2.get("Username");
+                String filename = (String) jsonObject2.get("Filename");
+                String fileInfo = desc + " " + username + " " + filename;
+                if(users.contains(fileInfo)){
+                    System.out.println("File info already exists: " + fileInfo);
+                }
+                else{
+                    files.add(fileInfo);
+                }
             }
-            else{
-                files.add(fileInfo);
-            }
-            printFiles();  */  
+            printFiles();
         }
         catch(ParseException ex){
-            System.out.println("Problem parsing JSON");
+            System.out.println("Problem parsing JSON: " + ex);
         }
         catch(IOException ex){
-            System.out.println("Problem writing file info");
+            System.out.println("Problem writing file info: " + ex);
         }
 
     }
