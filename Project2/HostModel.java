@@ -26,17 +26,27 @@ public class HostModel{
         }
     }
 
-    //Send message to server (username, hostname, speed)
-    public void sendMessage(String message){
+    //Send message to server (username, hostname, speed, )
+    public void sendMessage(String[] message){
         try{
             outToServer = new DataOutputStream(socket.getOutputStream());
-            outToServer.writeBytes(message + '\n');
-            if(message.equals("quit")){
-                socket.close();
+            for(String s : message){
+                outToServer.writeBytes(s + '\n');
             }
+            outToServer.writeBytes(EOF + '\n');
         }
         catch(IOException ex){
-            System.out.println("Problem writing to server" + ex);
+            System.out.println("Problem writing to server: " + ex);            
+        }
+    }
+    
+    //Disconnect from server
+    public void quit(){
+        try{
+            socket.close();
+        }
+        catch(IOException ex){
+            System.out.println("Problem disconnecting from server: " + ex);
         }
     }
 

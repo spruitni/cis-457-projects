@@ -44,6 +44,7 @@ class ClientHandler extends Thread{
     private Socket connectionSocket; 
     private BufferedReader inFromClient;
     private int clientNumber;
+    private final String EOF = "EOF";
     private static final String jsonFile = "fileInfo.json";
 
     //Creates client
@@ -66,15 +67,16 @@ class ClientHandler extends Thread{
         //Continue logic until client closes connection
         boolean cont = true;
         do{
-            String message;
             try{
-                if((message = inFromClient.readLine()).equals("quit")){
-                    cont = false;
+                ArrayList<String> info = new ArrayList<String>();
+                String message;
+                while(!(message = inFromClient.readLine()).equals(EOF)){
+                    info.add(message);
                 }
-                else{
-                    NapsterDatabase.addUser(message);
-                    NapsterDatabase.addFileInfo();
-                }
+                
+                NapsterDatabase.addUser(info);
+                NapsterDatabase.addFileInfo();
+                
             }
             catch(IOException ex){
                 System.out.println("Error reading from client");

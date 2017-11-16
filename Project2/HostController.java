@@ -32,7 +32,9 @@ public class HostController{
                     String hostname = hostView.getHostName();
                     int hostPort = hostView.getHostPort();
                     String speed = hostView.getSpeed();
-                    hostModel.sendMessage(username + " " + hostname + " " + hostPort + " " + speed);
+                    String[] userInfo = {username, hostname, hostPort, speed};
+
+                    hostModel.sendMessage(userInfo);
                     System.out.println("Sent user info to central server");
                     hostModel.uploadFile(username);
                     System.out.println("Sent file info to central server");
@@ -52,7 +54,7 @@ public class HostController{
             public void windowClosing(WindowEvent event){
                 hostView.dispose();
                 try{
-                    hostModel.sendMessage("quit\n");
+                    hostModel.quit();
                 }
                 catch(NullPointerException ex){
                     System.out.println("Problem disconnecting from central server: " + ex);
