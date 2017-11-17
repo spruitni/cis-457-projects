@@ -48,6 +48,18 @@ public class NapsterDatabase{
         }
     }
 
+    //Search for a keyword and return any that match
+    public static ArrayList<ArrayList<String>> search(String searchDesc){
+        ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+        for(ArrayList<String> f : files){
+            if(f.get(2).toLowerCase().contains(searchDesc.toLowerCase())){
+                results.add(f);
+            }
+        } 
+        return results;
+    }
+
+
     //Testing only - display all users and files in database
     public static void printUsers(){
         for(ArrayList<String> user : users){

@@ -30,7 +30,7 @@ public class HostController{
                     hostModel.connectToServer(hostView.getServerName(), hostView.getPort());
                     String username = hostView.getUserName();
                     String hostname = hostView.getHostName();
-                    int hostPort = hostView.getHostPort();
+                    String hostPort = Integer.toString(hostView.getHostPort());
                     String speed = hostView.getSpeed();
                     String[] userInfo = {username, hostname, hostPort, speed};
 
@@ -45,6 +45,15 @@ public class HostController{
 
                 //Search
                 if(event.getSource() == hostView.getSearchButton()){
+                    String keyword;
+                    if(!(keyword = hostView.getKeyword()).isEmpty()){
+                        ArrayList<ArrayList<String>> results = NapsterDatabase.search(searchDesc);
+
+                    }
+
+
+
+
                 }
             }
         };

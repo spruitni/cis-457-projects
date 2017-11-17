@@ -58,7 +58,8 @@ public class HostView extends JFrame{
         hostPort.setPreferredSize(new Dimension(150,30));
         keyword.setPreferredSize(new Dimension(150,30));
         command.setPreferredSize(new Dimension(150,30));
-        commandWindow.setPreferredSize(new Dimension(300, 100));
+        scroll.setPreferredSize(new Dimension(300,100));
+        //commandWindow.setPreferredSize(new Dimension(300, 100));
         searchButton.setEnabled(false);
         goButton.setEnabled(false);
 
@@ -162,5 +163,10 @@ public class HostView extends JFrame{
     //Get selected speed
     public String getSpeed(){
         return speed.getSelectedItem().toString();
+    }
+
+    //Get keyword search
+    public String getKeyword(){
+        return keyword.getText();
     }
 }

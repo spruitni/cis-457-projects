@@ -3,6 +3,8 @@
 ## To compile... (ignore notes on unchecked/unsafe operations):
 `javac -cp json.jar HostModel.java`
 
+`javac -cp json.jar NapsterDatabase.java`
+
 `javac HostView.java`
 
 `javac HostController.java`
