@@ -36,8 +36,12 @@ public class NapsterDatabase{
                 fileInfo[0] = (String) jsonObject2.get("Username");
                 fileInfo[1] = (String) jsonObject2.get("Filename");
                 fileInfo[2] = (String) jsonObject2.get("Description");
-                fileInfo[3] = "speed goes here";
-                System.out.println(fileInfo[1]);
+                for(String[] user : users){
+                    if(user[0].equals(fileInfo[0])){
+                        fileInfo[3] = user[3];
+                        break;
+                    }
+                }
                 files.add(fileInfo);
             }
             printFiles();

@@ -46,6 +46,7 @@ class ClientHandler extends Thread{
     private DataOutputStream outToClient;
     private int clientNumber;
     private final String EOF = "EOF";
+    private final String EOL = "EOL";
     private static final String jsonFile = "fileInfo.json";
 
     //Creates client
@@ -85,8 +86,8 @@ class ClientHandler extends Thread{
                 //Server sends file info to host upon search
                 else if(messageParts[0].equals("Search")){
                     ArrayList<String[]> results = NapsterDatabase.search(messageParts[1]);
-                    for(String[] result : results){
-                        outToClient.writeBytes(String.join(" ", result) + '\n');
+                    for(String[] result: results){
+                        outToClient.writeBytes(String.join(",",result) + '\n');
                     }
                     outToClient.writeBytes(EOF + '\n');
                 }

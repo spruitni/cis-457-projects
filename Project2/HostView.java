@@ -13,7 +13,7 @@ public class HostView extends JFrame{
     private JLabel serverLabel, portLabel, userLabel, hostLabel, 
             hostPortLabel, speedLabel, keywordLabel, commandLabel;
     private JTextField serverName, port, userName, hostName, hostPort, keyword, command;
-    private JScrollPane scroll;
+    private JScrollPane tableScroll, scroll;
     private JTextArea commandWindow;
     private JButton connectButton, searchButton, goButton;
     private JComboBox speed;
@@ -136,6 +136,11 @@ public class HostView extends JFrame{
 
     //Add table with search results
     public void addTable(String[] columnNames, ArrayList<String[]> data){
+        if(tableScroll != null){
+            middlePanel.remove(tableScroll);
+        }
+        middlePanel.revalidate();
+        middlePanel.repaint();
         String[][] dataArray = new String[data.size()][4];
         for(int i = 0; i < data.size(); i++){
             String[] fileInfo = data.get(i);
@@ -143,11 +148,10 @@ public class HostView extends JFrame{
                 dataArray[i][j] = fileInfo[j];
             }
         }
-        //String[][] dataArray = {{"hello", "hi", "one", "two"}, {"hello", "hi", "one", "two"}};
         table = new JTable(dataArray, columnNames);
-        middlePanel.add(table, getGBC(0, 1, 12, 4, true, true));
-        middlePanel.revalidate();
-        middlePanel.repaint();
+        tableScroll = new JScrollPane(table);
+        tableScroll.setPreferredSize(new Dimension(600,100));
+        middlePanel.add(tableScroll, getGBC(0, 1, 12, 4, true, true));
     }
 
     //Get button values

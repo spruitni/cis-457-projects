@@ -47,13 +47,9 @@ public class HostController{
                     String keyword = hostView.getKeyword();
                     if(!keyword.isEmpty() && keyword != null){
                         hostModel.sendMessage("Search " + keyword);
-                        hostModel.readMessage();
-
-
-
-                        //ArrayList<String[]> results = NapsterDatabase.search(keyword);
-                        //String[] columnNames = {"Filename", "Hostname", "Description", "Speed"};
-                        //hostView.addTable(columnNames, results);
+                        ArrayList<String[]> results = hostModel.readSearchResults();
+                        String[] columnNames = {"Filename", "Hostname", "Description", "Speed"};
+                        hostView.addTable(columnNames, results);
                     }
                 }
             }

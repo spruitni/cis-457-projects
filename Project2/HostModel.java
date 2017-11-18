@@ -11,6 +11,7 @@ public class HostModel{
 
     //Class attributes
     private final String EOF = "EOF";
+    private final String EOL = "EOL";
     private Socket socket;
     private DataOutputStream outToServer;
     private BufferedReader inFromServer;
@@ -39,16 +40,20 @@ public class HostModel{
     }
 
     //Read file info from server
-    public void readMessage(){
+    public ArrayList<String[]> readSearchResults(){
+        ArrayList<String[]> results = new ArrayList<String[]>();
         try{
             inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String results;
-            while(!(results = inFromServer.readLine()).equals(EOF)){
-                System.out.println(results);
+            String message;
+            while(!(message = inFromServer.readLine()).equals(EOF)){
+                results.add(message.split(","));
             }
         }
         catch(IOException ex){
             System.out.println("Problem reading search results from server: " + ex);
+        }
+        finally{
+            return results;
         }
     }
     
