@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class HostView extends JFrame{
     
     private JLabel serverLabel, portLabel, userLabel, hostLabel, 
-            hostPortLabel, speedLabel, keywordLabel, commandLabel;
+            hostPortLabel, speedLabel, keywordLabel, commandLabel, messageLabel;
     private JTextField serverName, port, userName, hostName, hostPort, keyword, command;
     private JScrollPane tableScroll, scroll;
     private JTextArea commandWindow;
@@ -37,6 +37,7 @@ public class HostView extends JFrame{
         speedLabel = new JLabel("Speed: ");
         keywordLabel = new JLabel("Keyword: ");
         commandLabel = new JLabel("Enter Command: ");
+        messageLabel = new JLabel();
         serverName = new JTextField();
         port = new JTextField();
         userName = new JTextField();
@@ -61,7 +62,6 @@ public class HostView extends JFrame{
         keyword.setPreferredSize(new Dimension(300,30));
         command.setPreferredSize(new Dimension(300,30));
         scroll.setPreferredSize(new Dimension(300,100));
-        //commandWindow.setPreferredSize(new Dimension(300, 100));
         searchButton.setEnabled(false);
         goButton.setEnabled(false);
 
@@ -84,6 +84,7 @@ public class HostView extends JFrame{
         topPanel.add(hostPort, getGBC(5,1,1,1,false,false));
         topPanel.add(speedLabel, getGBC(6,1,1,1,false,false));
         topPanel.add(speed, getGBC(7,1,1,1,false,false));
+        topPanel.add(messageLabel, getGBC(0,2,6,1,true,false));
 
         //Add components to the middle panel
         middlePanel.add(keywordLabel, getGBC(0,0,2,1,true,false));
@@ -171,8 +172,8 @@ public class HostView extends JFrame{
     }
 
     //Get port number as integer
-    public int getPort(){
-        return Integer.parseInt(port.getText());
+    public String getPort(){
+        return port.getText();
     }
 
     //Get username
@@ -186,8 +187,13 @@ public class HostView extends JFrame{
     }
 
     //Get host port number as integer
-    public int getHostPort(){
-        return Integer.parseInt(hostPort.getText());
+    public String getHostPort(){
+        return hostPort.getText();
+    }
+
+    //Set message to user
+    public void setMessage(String m){
+        messageLabel.setText(m);
     }
 
     //Get selected speed

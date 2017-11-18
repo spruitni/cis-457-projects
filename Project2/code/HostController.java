@@ -3,6 +3,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.awt.event.WindowEvent;
+import java.util.*;
+import java.io.*;
 
 public class HostController{
 
@@ -10,14 +12,15 @@ public class HostController{
     private HostView hostView;
     private ActionListener actionListener;
     private WindowListener windowListener;
+    private final String HOST_DESC = "../hostDescriptions/";
 
     public HostController(){
         this.hostView = new HostView();
+        this.hostModel = new HostModel();
     }
 
     //Listens for GUI events
     public void control(){
-        hostModel = new HostModel();
 
         //Listen for button clicked, etc.
         actionListener = new ActionListener(){
@@ -28,18 +31,27 @@ public class HostController{
 
                     //This host's files will be in a directory that is named the username
                     //This is done so that when the host uploads the file info, it knows what files to upload
-                    hostModel.connectToServer(hostView.getServerName(), hostView.getPort());
-                    String username = hostView.getUserName();
-                    String hostname = hostView.getHostName();
-                    String hostPort = Integer.toString(hostView.getHostPort());
-                    String speed = hostView.getSpeed();
-                    hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
-                    System.out.println("Sent user info to central server");
-                    hostModel.uploadFile(username);
-                    System.out.println("Sent file info to central server");
+                    String message;
+                    if((message = validateInput()).equals("")){
+                        String username = hostView.getUserName();
+                        String hostname = hostView.getHostName();
+                        String hostPort = hostView.getHostPort();
+                        String speed = hostView.getSpeed();
 
-                    //Host is now allowed to do keyword searches, enable search button
-                    hostView.getSearchButton().setEnabled(true);
+                        //Connect to server
+                        hostModel.connectToServer(hostView.getServerName(), Integer.parseInt(hostView.getPort()));
+                        hostView.setMessage(message);
+                        hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
+                        System.out.println("Sent user info to central server");
+                        hostModel.uploadFile(username);
+                        System.out.println("Sent file info to central server");
+    
+                        //Host is now allowed to do keyword searches, enable search button
+                        hostView.getSearchButton().setEnabled(true);
+                    }
+                    else{
+                        hostView.setMessage(message);
+                    }
                 }
 
                 //Search
@@ -86,10 +98,34 @@ public class HostController{
         hostView.addWindowListener(windowListener);
     }
 
+    //Validates user input
+    private String validateInput(){
+        String hostname = hostView.getHostName();
+        String serverPort = hostView.getHostPort();
+        String serverName = hostView.getServerName();
+        String username = hostView.getUserName();
+        String hostPort = hostView.getHostPort();
+        if(serverName.equals("") || serverPort.equals("") || username.equals("") || hostname.equals("") || hostPort.equals("")){
+            return "ERROR: EMPTY FIELD(S)";
+        }
+        else{
+            File folder = new File(HOST_DESC);
+            boolean fileFound = false;
+            for(File file : folder.listFiles()){
+                if(file.getName().equals(username + "Files.txt")){
+                    fileFound = true;
+                }
+            }
+            if(!fileFound){
+                return "ERROR: INVALID USERNAME";
+            }
+        }
+        return "";
+    }
+
     //Start Host GUI
     public static void main(String[] args){
         HostController hc = new HostController();
         hc.control();
     }
-
 }

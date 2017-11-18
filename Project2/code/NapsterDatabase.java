@@ -65,7 +65,6 @@ public class NapsterDatabase{
         return results;
     }
 
-
     //Testing only - display all users and files in database
     public static void printUsers(){
         for(String[] user : users){

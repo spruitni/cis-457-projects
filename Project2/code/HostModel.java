@@ -16,7 +16,7 @@ public class HostModel{
     private DataOutputStream outToServer;
     private BufferedReader inFromServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
-    private final String FILE_DIRECTORY = "hostFiles/";
+    private final String FILE_DIRECTORY = "../hostDescriptions/";
     
     //Create a connection to server
     public void connectToServer(String serverIP, int serverPort){
@@ -72,15 +72,19 @@ public class HostModel{
         try{
             JSONObject obj1 = new JSONObject();
             JSONArray arr1 = new JSONArray();
-            File folder = new File(username + "Files");
-            
-            for(File file : folder.listFiles()){
+            File hostDesc = new File(FILE_DIRECTORY +  username + "Files.txt");
+            BufferedReader reader = new BufferedReader(new FileReader(hostDesc));
+            String line;
+            while((line = reader.readLine()) != null) {
+                String[] descParts = line.split(",");
                 JSONObject obj2 = new JSONObject();
                 obj2.put("Username", username);
-                obj2.put("Filename", file.getName());
-                obj2.put("Description", "some description here"); //WHERE DO THE DESCRIPTIONS COME FROM???
+                obj2.put("Filename", descParts[0]);
+                obj2.put("Description", descParts[1]);
                 arr1.add(obj2);                    
+                //System.out.println(line);
             }
+            reader.close();
             obj1.put("Files", arr1);
             FileWriter file = new FileWriter(JSON_FILE_NAME);
             file.write(obj1.toJSONString());
