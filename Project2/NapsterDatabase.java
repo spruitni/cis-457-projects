@@ -10,15 +10,15 @@ public class NapsterDatabase{
 
     //Database is made of tables for users and files
     static String jsonFile = "fileInfo.json";
-    static ArrayList<ArrayList<String>> users;
-    static ArrayList<ArrayList<String>> files;
+    static ArrayList<String[]> users;
+    static ArrayList<String[]> files;
     public NapsterDatabase(){
-        users = new ArrayList<ArrayList<String>>();
-        files = new ArrayList<ArrayList<String>>(); 
+        users = new ArrayList<String[]>();
+        files = new ArrayList<String[]>(); 
     }
 
     //Add user to the "users" table
-    public static void addUser(ArrayList<String> userInfo){
+    public static void addUser(String[] userInfo){
         users.add(userInfo);
         printUsers();
     }
@@ -26,16 +26,18 @@ public class NapsterDatabase{
     //Parse JSON file and Add file information to the "files" table
     public static void addFileInfo(){
         try{
-            ArrayList<String> fileInfo = new ArrayList<String>();
             JSONParser parser = new JSONParser();
             JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(jsonFile));
             JSONArray filesArray = (JSONArray) jsonObject.get("Files");
             Iterator<JSONObject> iterator = filesArray.iterator();
-            while (iterator.hasNext()){
+            while(iterator.hasNext()){
                 JSONObject jsonObject2 = iterator.next(); 
-                fileInfo.add((String) jsonObject2.get("Username"));
-                fileInfo.add((String) jsonObject2.get("Filename"));
-                fileInfo.add((String) jsonObject2.get("Description"));
+                String[] fileInfo = new String[4];
+                fileInfo[0] = (String) jsonObject2.get("Username");
+                fileInfo[1] = (String) jsonObject2.get("Filename");
+                fileInfo[2] = (String) jsonObject2.get("Description");
+                fileInfo[3] = "speed goes here";
+                System.out.println(fileInfo[1]);
                 files.add(fileInfo);
             }
             printFiles();
@@ -49,27 +51,27 @@ public class NapsterDatabase{
     }
 
     //Search for a keyword and return any that match
-    public static ArrayList<ArrayList<String>> search(String searchDesc){
-        ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
-        for(ArrayList<String> f : files){
-            if(f.get(2).toLowerCase().contains(searchDesc.toLowerCase())){
-                results.add(f);
+    public static ArrayList<String[]> search(String searchDesc){
+        ArrayList<String[]> results = new ArrayList<String[]>();
+        for(String[] file : files){
+            if(file[2].toLowerCase().contains(searchDesc.toLowerCase())){   
+                results.add(file);
             }
-        } 
+        }
         return results;
     }
 
 
     //Testing only - display all users and files in database
     public static void printUsers(){
-        for(ArrayList<String> user : users){
+        for(String[] user : users){
             for(String userInfo : user){
                 System.out.println(userInfo);
             }
         }
     }
     public static void printFiles(){
-        for(ArrayList<String> file : files){
+        for(String[] file : files){
             for(String fileInfo : file){
                 System.out.println(fileInfo);
             }

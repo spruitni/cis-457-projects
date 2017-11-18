@@ -13,6 +13,7 @@ public class HostModel{
     private final String EOF = "EOF";
     private Socket socket;
     private DataOutputStream outToServer;
+    private BufferedReader inFromServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "hostFiles/";
     
@@ -27,16 +28,27 @@ public class HostModel{
     }
 
     //Send message to server (username, hostname, speed, )
-    public void sendMessage(String[] message){
+    public void sendMessage(String message){
         try{
             outToServer = new DataOutputStream(socket.getOutputStream());
-            for(String s : message){
-                outToServer.writeBytes(s + '\n');
-            }
-            outToServer.writeBytes(EOF + '\n');
+            outToServer.writeBytes(message + '\n');
         }
         catch(IOException ex){
             System.out.println("Problem writing to server: " + ex);            
+        }
+    }
+
+    //Read file info from server
+    public void readMessage(){
+        try{
+            inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String results;
+            while(!(results = inFromServer.readLine()).equals(EOF)){
+                System.out.println(results);
+            }
+        }
+        catch(IOException ex){
+            System.out.println("Problem reading search results from server: " + ex);
         }
     }
     

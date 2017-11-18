@@ -11,10 +11,6 @@
 
 `javac CentralServer.java`
 
-and
-
-`javac CentralServer.java`
-
 ## To run you must specify the classpath for the JSON jar file 
 `javac -cp ";json.jar" CentralServer`
 

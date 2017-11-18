@@ -43,6 +43,7 @@ class ClientHandler extends Thread{
     //Control connection socket 
     private Socket connectionSocket; 
     private BufferedReader inFromClient;
+    private DataOutputStream outToClient;
     private int clientNumber;
     private final String EOF = "EOF";
     private static final String jsonFile = "fileInfo.json";
@@ -55,6 +56,7 @@ class ClientHandler extends Thread{
         //Get control input from client
         try{
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+            outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         }
         catch(IOException ex){
             System.out.println("Problem creating input/output streams: " + ex);
@@ -66,20 +68,31 @@ class ClientHandler extends Thread{
         
         //Continue logic until client closes connection
         boolean cont = true;
+
+        //Server can REGISTER host (upload file info) and SEARCH for file info
         do{
             try{
-                ArrayList<String> info = new ArrayList<String>();
-                String message;
-                while(!(message = inFromClient.readLine()).equals(EOF)){
-                    info.add(message);
+                String message = inFromClient.readLine();
+                String[] messageParts = message.split("\\s");
+                String[] messageBody = Arrays.copyOfRange(messageParts, 1, messageParts.length);
+                
+                //Host registers with server
+                if(messageParts[0].equals("Register")){
+                    NapsterDatabase.addUser(messageBody);
+                    NapsterDatabase.addFileInfo();
                 }
-                
-                NapsterDatabase.addUser(info);
-                NapsterDatabase.addFileInfo();
-                
+
+                //Server sends file info to host upon search
+                else if(messageParts[0].equals("Search")){
+                    ArrayList<String[]> results = NapsterDatabase.search(messageParts[1]);
+                    for(String[] result : results){
+                        outToClient.writeBytes(String.join(" ", result) + '\n');
+                    }
+                    outToClient.writeBytes(EOF + '\n');
+                }
             }
             catch(IOException ex){
-                System.out.println("Error reading from client");
+                System.out.println("Error reading from client: " + ex);
             }
         }while(cont);
 

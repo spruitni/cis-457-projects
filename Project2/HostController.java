@@ -1,6 +1,7 @@
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.awt.event.WindowEvent;
 
 public class HostController{
@@ -16,6 +17,7 @@ public class HostController{
 
     //Listens for GUI events
     public void control(){
+        hostModel = new HostModel();
 
         //Listen for button clicked, etc.
         actionListener = new ActionListener(){
@@ -26,15 +28,12 @@ public class HostController{
 
                     //This host's files will be in a directory that is named the username
                     //This is done so that when the host uploads the file info, it knows what files to upload
-                    hostModel = new HostModel();
                     hostModel.connectToServer(hostView.getServerName(), hostView.getPort());
                     String username = hostView.getUserName();
                     String hostname = hostView.getHostName();
                     String hostPort = Integer.toString(hostView.getHostPort());
                     String speed = hostView.getSpeed();
-                    String[] userInfo = {username, hostname, hostPort, speed};
-
-                    hostModel.sendMessage(userInfo);
+                    hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
                     System.out.println("Sent user info to central server");
                     hostModel.uploadFile(username);
                     System.out.println("Sent file info to central server");
@@ -45,15 +44,17 @@ public class HostController{
 
                 //Search
                 if(event.getSource() == hostView.getSearchButton()){
-                    String keyword;
-                    if(!(keyword = hostView.getKeyword()).isEmpty()){
-                        ArrayList<ArrayList<String>> results = NapsterDatabase.search(searchDesc);
+                    String keyword = hostView.getKeyword();
+                    if(!keyword.isEmpty() && keyword != null){
+                        hostModel.sendMessage("Search " + keyword);
+                        hostModel.readMessage();
 
+
+
+                        //ArrayList<String[]> results = NapsterDatabase.search(keyword);
+                        //String[] columnNames = {"Filename", "Hostname", "Description", "Speed"};
+                        //hostView.addTable(columnNames, results);
                     }
-
-
-
-
                 }
             }
         };
@@ -82,7 +83,10 @@ public class HostController{
             public void windowStateChanged(WindowEvent event){System.out.println("GUI State Change");}
         };
 
+        //Add listeners to GUI components
         hostView.getConnectButton().addActionListener(actionListener);
+        hostView.getSearchButton().addActionListener(actionListener);
+        hostView.getGoButton().addActionListener(actionListener);
         hostView.addWindowListener(windowListener);
     }
 

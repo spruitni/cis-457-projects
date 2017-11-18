@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.util.ArrayList;
 
 public class HostView extends JFrame{
     
@@ -16,6 +17,7 @@ public class HostView extends JFrame{
     private JTextArea commandWindow;
     private JButton connectButton, searchButton, goButton;
     private JComboBox speed;
+    private JTable table;
     private JPanel mainPanel, topPanel, middlePanel, bottomPanel;
 
     //Create GUI
@@ -56,8 +58,8 @@ public class HostView extends JFrame{
         userName.setPreferredSize(new Dimension(150,30));
         hostName.setPreferredSize(new Dimension(150,30));
         hostPort.setPreferredSize(new Dimension(150,30));
-        keyword.setPreferredSize(new Dimension(150,30));
-        command.setPreferredSize(new Dimension(150,30));
+        keyword.setPreferredSize(new Dimension(300,30));
+        command.setPreferredSize(new Dimension(300,30));
         scroll.setPreferredSize(new Dimension(300,100));
         //commandWindow.setPreferredSize(new Dimension(300, 100));
         searchButton.setEnabled(false);
@@ -98,16 +100,21 @@ public class HostView extends JFrame{
         mainPanel.add(topPanel);
         mainPanel.add(middlePanel);
         mainPanel.add(bottomPanel);
+        frameSetup();
 
+    }
+    
+    private void frameSetup(){
+        
         //JFrame setup and additions
         this.setTitle("GV-Napster Host");
         this.add(mainPanel);
-        this.setSize(900,600);
+        this.setSize(900,700);
         this.getContentPane();   
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
-    
+
     //Creates GridBagConstraints 
     private GridBagConstraints getGBC(int x, int y, int w, int h, boolean fillHor, boolean fillVer){
         GridBagConstraints gbc = new GridBagConstraints();
@@ -127,12 +134,31 @@ public class HostView extends JFrame{
         return gbc;
     }
 
+    //Add table with search results
+    public void addTable(String[] columnNames, ArrayList<String[]> data){
+        String[][] dataArray = new String[data.size()][4];
+        for(int i = 0; i < data.size(); i++){
+            String[] fileInfo = data.get(i);
+            for(int j = 0; j < fileInfo.length; j++){
+                dataArray[i][j] = fileInfo[j];
+            }
+        }
+        //String[][] dataArray = {{"hello", "hi", "one", "two"}, {"hello", "hi", "one", "two"}};
+        table = new JTable(dataArray, columnNames);
+        middlePanel.add(table, getGBC(0, 1, 12, 4, true, true));
+        middlePanel.revalidate();
+        middlePanel.repaint();
+    }
+
     //Get button values
     public JButton getConnectButton(){
         return connectButton;
     }
     public JButton getSearchButton(){
         return searchButton;
+    }
+    public JButton getGoButton(){
+        return goButton;
     }
 
     //Get server name (IP address)
