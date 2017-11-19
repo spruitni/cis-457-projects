@@ -10,7 +10,7 @@
 `javac HostController.java`
 
 ## To run you must specify the classpath for the JSON jar file 
-`javac -cp ";json.jar" CentralServer`
+`java -cp ";json.jar" CentralServer`
 
-`javac -cp ";json.jar" HostController`
+`java -cp ";json.jar" HostController`
 
