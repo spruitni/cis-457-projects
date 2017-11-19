@@ -68,7 +68,7 @@ public class HostModel{
         }
     }
 
-    //Upload file to current directory with file info
+    //Upload JSON file to current directory, which contains file info
     public void uploadFile(String username){
         hostFiles = new ArrayList<String>();
         try{
