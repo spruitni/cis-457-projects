@@ -17,17 +17,27 @@ public class HostModel{
     private BufferedReader inFromServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "../hostDescriptions/";
+    private int port;
+    private String ip;
     
     //Create a connection to server
-    public void connectToServer(String serverIP, int serverPort){
+    public boolean connectToServer(String serverIP, int serverPort){
         try{
             this.socket = new Socket(serverIP, serverPort);
+            return true;
         }
         catch(IOException ex){
             System.out.println("Problem connecting to server");
+            return false;
         }
     }
-
+    
+    //Sets up host connection details
+    public void setup(String ipAddress, int portNumber){
+        ip = ipAddress;
+        port = portNumber;
+    }
+    
     //Send message to server (username, hostname, speed, )
     public void sendMessage(String message){
         try{
@@ -56,16 +66,7 @@ public class HostModel{
             return results;
         }
     }
-    
-    //Disconnect from server
-    public void quit(){
-        try{
-            socket.close();
-        }
-        catch(IOException ex){
-            System.out.println("Problem disconnecting from server: " + ex);
-        }
-    }
+
 
     //Upload file to current directory with file info
     public void uploadFile(String username){
@@ -81,8 +82,7 @@ public class HostModel{
                 obj2.put("Username", username);
                 obj2.put("Filename", descParts[0]);
                 obj2.put("Description", descParts[1]);
-                arr1.add(obj2);                    
-                //System.out.println(line);
+                arr1.add(obj2);            
             }
             reader.close();
             obj1.put("Files", arr1);

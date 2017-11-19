@@ -39,15 +39,26 @@ public class HostController{
                         String speed = hostView.getSpeed();
 
                         //Connect to server
-                        hostModel.connectToServer(hostView.getServerName(), Integer.parseInt(hostView.getPort()));
-                        hostView.setMessage(message);
-                        hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
-                        System.out.println("Sent user info to central server");
-                        hostModel.uploadFile(username);
-                        System.out.println("Sent file info to central server");
-    
-                        //Host is now allowed to do keyword searches, enable search button
-                        hostView.getSearchButton().setEnabled(true);
+                        boolean connected = hostModel.connectToServer(hostView.getServerName(), Integer.parseInt(hostView.getPort()));
+                        if(connected){
+
+                            //Setup host info
+                            hostModel.setup(hostname, Integer.parseInt(hostPort));
+                            hostView.getConnectButton().setEnabled(false);
+                            hostView.setMessage(message);
+                            hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
+                            System.out.println("Sent user info to central server");
+                            hostModel.uploadFile(username);
+                            hostModel.sendMessage("Upload");
+                            System.out.println("Sent file info to central server");
+                            hostView.getConnectButton().setEnabled(false);
+        
+                            //Host is now allowed to do keyword searches, enable search button, disable connect button
+                            hostView.getSearchButton().setEnabled(true);
+                        }
+                        else{
+                            hostView.setMessage("ERROR: CONNECTION FAILED");
+                        }
                     }
                     else{
                         hostView.setMessage(message);
@@ -60,9 +71,12 @@ public class HostController{
                     if(!keyword.isEmpty() && keyword != null){
                         hostModel.sendMessage("Search " + keyword);
                         ArrayList<String[]> results = hostModel.readSearchResults();
-                        String[] columnNames = {"Filename", "Hostname", "Description", "Speed"};
+                        String[] columnNames = {"Username", "Filename", "Host Details", "Speed"};
                         hostView.addTable(columnNames, results);
                     }
+
+                    //Host is now allowed to enter commands to get files from other hosts
+                    hostView.getGoButton().setEnabled(true);
                 }
             }
         };
@@ -72,7 +86,7 @@ public class HostController{
             public void windowClosing(WindowEvent event){
                 hostView.dispose();
                 try{
-                    hostModel.quit();
+                    hostModel.sendMessage("quit");
                 }
                 catch(NullPointerException ex){
                     System.out.println("Problem disconnecting from central server: " + ex);
