@@ -64,6 +64,7 @@ public class HostView extends JFrame{
         scroll.setPreferredSize(new Dimension(300,100));
         searchButton.setEnabled(false);
         goButton.setEnabled(false);
+        commandWindow.setEnabled(false);
 
         //Add title borders
         topPanel.setBorder(new TitledBorder("Connection"));
@@ -157,7 +158,6 @@ public class HostView extends JFrame{
 
     //GETTERS & SETTERS
 
-    //Get button values
     public JButton getConnectButton(){
         return connectButton;
     }
@@ -167,49 +167,47 @@ public class HostView extends JFrame{
     public JButton getGoButton(){
         return goButton;
     }
-
-    //Get server name (IP address)
     public String getServerName(){
         return serverName.getText();
     }
-
-    //Get port number as integer
     public String getPort(){
         return port.getText();
     }
-
-    //Get username
     public String getUserName(){
         return userName.getText();
     }
-
-    //Get host name
     public String getHostName(){
         return hostName.getText();
     }
-
-    //Get host port number as integer
     public String getHostPort(){
         return hostPort.getText();
     }
-
-    //Set message to user
     public void setMessage(String m){
         messageLabel.setText(m);
     }
-
-    //Get selected speed
     public String getSpeed(){
         return speed.getSelectedItem().toString();
     }
-
-    //Get keyword search
     public String getKeyword(){
         return keyword.getText();
     }
-
-    //Get command
     public String getCommand(){
         return command.getText();
     }
+    public void setCommandWindow(String c){
+        commandWindow.append(c);
+    }
+    public void clear(){
+        serverName.setText("");
+        port.setText("");
+        userName.setText("");
+        hostName.setText("");
+        hostPort.setText("");
+        keyword.setText("");
+        command.setText("");
+        goButton.setEnabled(false);
+        connectButton.setEnabled(true);
+        searchButton.setEnabled(false);
+    }
+
 }

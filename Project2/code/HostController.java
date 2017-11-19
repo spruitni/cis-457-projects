@@ -67,7 +67,7 @@ public class HostController{
 
                 //Search
                 if(event.getSource() == hostView.getSearchButton()){
-                    String keyword = hostView.getKeyword();
+                    String keyword = hostView.getKeyword().trim();
                     if(!keyword.isEmpty() && keyword != null){
                         hostModel.sendMessage("Search " + keyword);
                         ArrayList<String[]> results = hostModel.readSearchResults();
@@ -82,9 +82,11 @@ public class HostController{
                 //Enter command
                 if(event.getSource() == hostView.getGoButton()){
                     String command = hostView.getCommand();
+                    hostView.setCommandWindow(">>> " + command + '\n');
                     if(command.equals("quit")){
-                        hostView.dispose();
                         hostModel.sendMessage("quit");
+                        hostView.setCommandWindow("Disconnected\n");
+                        hostView.clear();
                     }
                     else if(!command.isEmpty() && command != null){
                         //TODO

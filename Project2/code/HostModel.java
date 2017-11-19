@@ -17,6 +17,7 @@ public class HostModel{
     private BufferedReader inFromServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
     private final String FILE_DIRECTORY = "../hostDescriptions/";
+    private ArrayList<String> hostFiles;
     private int port;
     private String ip;
     
@@ -69,6 +70,7 @@ public class HostModel{
 
     //Upload file to current directory with file info
     public void uploadFile(String username){
+        hostFiles = new ArrayList<String>();
         try{
             JSONObject obj1 = new JSONObject();
             JSONArray arr1 = new JSONArray();
@@ -82,6 +84,7 @@ public class HostModel{
                 obj2.put("Filename", descParts[0]);
                 obj2.put("Description", descParts[1]);
                 arr1.add(obj2);            
+                hostFiles.add(descParts[0]);
             }
             reader.close();
             obj1.put("Files", arr1);
@@ -97,10 +100,16 @@ public class HostModel{
     //Get command from the Host
     public void getCommand(String command){
         String[] commandParts = command.split("\\s");
-        if(commandParts[1].equals("retr")){
+        if(commandParts[0].equals("connect")){
+            String ipAddress = commandParts[1];
+            String port = commandParts[2];
+            
+            
             //TODO
         }
-        else if(commandParts[1].equals("connect")){
+        else if(commandParts[0].equals("retr")){
+            
+            
             //TODO
         }
     }
