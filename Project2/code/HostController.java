@@ -78,6 +78,18 @@ public class HostController{
                     //Host is now allowed to enter commands to get files from other hosts
                     hostView.getGoButton().setEnabled(true);
                 }
+
+                //Enter command
+                if(event.getSource() == hostView.getGoButton()){
+                    String command = hostView.getCommand();
+                    if(command.equals("quit")){
+                        hostView.dispose();
+                        hostModel.sendMessage("quit");
+                    }
+                    else if(!command.isEmpty() && command != null){
+                        //TODO
+                    }
+                }
             }
         };
 

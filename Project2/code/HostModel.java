@@ -37,7 +37,7 @@ public class HostModel{
         ip = ipAddress;
         port = portNumber;
     }
-    
+
     //Send message to server (username, hostname, speed, )
     public void sendMessage(String message){
         try{
@@ -67,7 +67,6 @@ public class HostModel{
         }
     }
 
-
     //Upload file to current directory with file info
     public void uploadFile(String username){
         try{
@@ -92,6 +91,17 @@ public class HostModel{
         }
         catch(IOException ex){
             System.out.println("Problem writing JSON file: " + ex);
+        }
+    }
+
+    //Get command from the Host
+    public void getCommand(String command){
+        String[] commandParts = command.split("\\s");
+        if(commandParts[1].equals("retr")){
+            //TODO
+        }
+        else if(commandParts[1].equals("connect")){
+            //TODO
         }
     }
 }

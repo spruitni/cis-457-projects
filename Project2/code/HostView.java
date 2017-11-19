@@ -155,6 +155,8 @@ public class HostView extends JFrame{
         middlePanel.add(tableScroll, getGBC(0, 1, 12, 4, true, true));
     }
 
+    //GETTERS & SETTERS
+
     //Get button values
     public JButton getConnectButton(){
         return connectButton;
@@ -204,5 +206,10 @@ public class HostView extends JFrame{
     //Get keyword search
     public String getKeyword(){
         return keyword.getText();
+    }
+
+    //Get command
+    public String getCommand(){
+        return command.getText();
     }
 }
