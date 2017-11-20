@@ -12,11 +12,13 @@ public class HostModel{
     //Class attributes
     private final String EOF = "EOF";
     private final String EOL = "EOL";
+    private final String FILE_FOUND = "FILE_FOUND";
+    private final String FILE_NOT_FOUND = "FILE_NOT_FOUND";
+    private final String JSON_FILE_NAME = "fileInfo.json";
+    private final String FILE_DESC_DIR = "../hostDescriptions/";
     private Socket socket;
     private DataOutputStream outToServer;
     private BufferedReader inFromServer;
-    private final String JSON_FILE_NAME = "fileInfo.json";
-    private final String FILE_DESC_DIR = "../hostDescriptions/";
     private String hostFileDir;
     private String hostName;
     private ArrayList<String> hostFiles;
@@ -138,12 +140,18 @@ public class HostModel{
                     dataFromServer = new BufferedReader(new InputStreamReader(hostSocket.getInputStream()));
                     dataToServer = new DataOutputStream(hostSocket.getOutputStream());
                     dataToServer.writeBytes(fileName + '\n');
-                    BufferedWriter fileWriter = new BufferedWriter(new FileWriter(hostFileDir + "/" + fileName));
-                    String fileLine;
-                    while(!(fileLine = dataFromServer.readLine()).equals(EOF)){
-                        fileWriter.write(fileLine + '\n');
+                    if(dataFromServer.readLine().equals(FILE_FOUND)){
+                        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(hostFileDir + "/" + fileName));
+                        String fileLine;
+                        while(!(fileLine = dataFromServer.readLine()).equals(EOF)){
+                            fileWriter.write(fileLine + '\n');
+                        }
+                        fileWriter.close();
+                        return "File retrieved\n";
                     }
-                    fileWriter.close();
+                    else{
+                        return "File not found\n";
+                    }
                 }
                 catch(IOException ex){
                 }
@@ -152,13 +160,15 @@ public class HostModel{
                 return "Not connected to host\n";
             }
         }
-        return "";
+        return "Invalid command\n";
     }
 }
 
 //Thread for the host server
 class HostThread extends Thread{
     private final String EOF = "EOF";
+    private final String FILE_FOUND = "FILE_FOUND";
+    private final String FILE_NOT_FOUND = "FILE_NOT_FOUND";
     private int hostPort;
     private String hostName;
     private String hostFileDir;
@@ -187,16 +197,20 @@ class HostThread extends Thread{
             inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String fileName = inFromClient.readLine();
             System.out.println("HERE");
+            BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
+            outToClient = new DataOutputStream(clientSocket.getOutputStream());
             if(fileExists(fileName)){
-                BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
                 String fileLine;
-                outToClient = new DataOutputStream(clientSocket.getOutputStream());
+                outToClient.writeBytes(FILE_FOUND + '\n');
                 while((fileLine = fileReader.readLine()) != null){
                     outToClient.writeBytes(fileLine + '\n');
                 }
                 outToClient.writeBytes(EOF + '\n');
-                fileReader.close();
             }
+            else{
+                outToClient.writeBytes(FILE_NOT_FOUND + '\n');    
+            }
+            fileReader.close();
         }
         catch(IOException ex){
             System.out.println("No client accepted: " + ex);
