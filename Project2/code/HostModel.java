@@ -8,7 +8,7 @@ import org.json.simple.JSONArray;
 
 //Class performs host functions
 public class HostModel{
-
+    
     //Class attributes
     private final String EOF = "EOF";
     private final String EOL = "EOL";
@@ -16,19 +16,16 @@ public class HostModel{
     private DataOutputStream outToServer;
     private BufferedReader inFromServer;
     private final String JSON_FILE_NAME = "fileInfo.json";
-    private final String FILE_DIRECTORY = "../hostDescriptions/";
+    private final String FILE_DESC_DIR = "../hostDescriptions/";
+    private String hostFileDir;
+    private String hostName;
     private ArrayList<String> hostFiles;
-    private int port;
-    private String ip;
-    private FTPClientServer ftpClientServer;
-
-    private DataOutputStream out;
-    private DataInputStream dis;
-    private FileInputStream fis;
-    private ServerSocket welcomeData;
-    private static ServerSocket welcomeSocket;
-    private Socket dataSocket;
-   
+    private HostThread hostThread;
+    private String hostIP;
+    private int hostPort;
+    private BufferedReader dataFromServer;
+    private DataOutputStream dataToServer;
+    private Socket hostSocket = null;
     
     //Create a connection to server
     public boolean connectToServer(String serverIP, int serverPort){
@@ -41,14 +38,22 @@ public class HostModel{
             return false;
         }
     }
-    
+
     //Sets up host connection details
-    public void setup(String ipAddress, int portNumber){
-        ip = ipAddress;
-        port = portNumber;
-        ftpClientServer = new FTPClientServer(port);
+    public void setup(String hostIP, int hostPort){
+        this.hostPort = hostPort;
+        this.hostIP = hostIP;
+        hostThread = new HostThread(hostPort, hostName, hostFiles, hostFileDir);
+        hostThread.start();
     }
     
+    //Shuts down the host server
+    public void shutdown(){
+        if(hostThread != null){
+            hostThread.shutdown();
+        }
+    }
+
     //Send message to server (username, hostname, speed, )
     public void sendMessage(String message){
         try{
@@ -80,11 +85,14 @@ public class HostModel{
 
     //Upload JSON file to current directory, which contains file info
     public void uploadFile(String username){
+        hostName = username;
+        hostFileDir = "../" + username + "Files/";
         hostFiles = new ArrayList<String>();
+        
         try{
             JSONObject obj1 = new JSONObject();
             JSONArray arr1 = new JSONArray();
-            File hostDesc = new File(FILE_DIRECTORY +  username + "Files.txt");
+            File hostDesc = new File(FILE_DESC_DIR +  username + "Files.txt");
             BufferedReader reader = new BufferedReader(new FileReader(hostDesc));
             String line;
             while((line = reader.readLine()) != null) {
@@ -108,244 +116,109 @@ public class HostModel{
     }
 
     //Get command from the Host
-    public void getCommand(String command){
+    public String getCommand(String command){
         String[] commandParts = command.split("\\s");
-        if(commandParts[0].equals("connect")){
+        if(commandParts[0].equals("connect") && commandParts.length == 3){
             String ipAddress = commandParts[1];
             int port = Integer.parseInt(commandParts[2]);
             try{
-                welcomeData = new ServerSocket(port);
-                dataSocket = welcomeData.accept();
-                dis = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-                out = new DataOutputStream(dataSocket.getOutputStream());
+                hostSocket = new Socket(ipAddress, port);
+                return "Connected to " + ipAddress + ":" + port + "\n";
             }
             catch(IOException ex){
-
+                System.out.println("Problem connecting to server");
+                return "Could not connect\n";
             }
-
+            
         }
-        else if(commandParts[0].equals("retr")){
-            out.writeBytes(command+ "\n");
-            String file = commandParts[1];
-            FileOutputStream out = null;
-            boolean fileExists = true;
-            try {
-                out = new FileOutputStream(file);
-            } catch (FileNotFoundException e) {
-                System.out.println("Client error: File Not Recieved.");
-                fileExists = false;
-            } 
-            try{
-                if (fileExists) {
-                    recieveFile(dis, out);
+        else if(commandParts[0].equals("retr") && commandParts.length == 2){
+            if(hostSocket != null){
+                String fileName = commandParts[1];
+                try{
+                    dataFromServer = new BufferedReader(new InputStreamReader(hostSocket.getInputStream()));
+                    dataToServer = new DataOutputStream(hostSocket.getOutputStream());
+                    dataToServer.writeBytes(fileName + '\n');
+                    BufferedWriter fileWriter = new BufferedWriter(new FileWriter(hostFileDir + "/" + fileName));
+                    String fileLine;
+                    while(!(fileLine = dataFromServer.readLine()).equals(EOF)){
+                        fileWriter.write(fileLine + '\n');
+                    }
+                    fileWriter.close();
                 }
-                welcomeData.close();
-                dataSocket.close();
-                dis.close();
-                out.close();
+                catch(IOException ex){
+                }
             }
-            catch(IOException ex){
+            else{
+                return "Not connected to host\n";
             }
         }
-
-    }
-
-    /*
-     * This private method is used to send a file to the client. It takes as
-     * parameters a FileInputStream fis and a DataOutStream os. While its trying
-     * to send the file will update with a message indicating it is still working.
-     */
-    private static void sendFile(FileInputStream fis, DataOutputStream os) throws IOException {
-        byte[] buffer = new byte[1024];
-        int bytes = 0;
-        while ((bytes = fis.read(buffer)) != -1) {
-            System.out.println("Sending File...");
-            os.write(buffer, 0, bytes);
-        }
-    }
-
-    /*
-     * This private method is used to recieve a file to the client. It takes as
-     * parameters a DataOutStream os and a FileInputStream fis. While its trying
-     * to recieve the file will update with a message indicating it is still working.
-     */
-    private static void recieveFile(DataInputStream dis, FileOutputStream os) throws IOException{
-        byte[] buffer = new byte[1024];
-        int bytes;
-        while ((bytes = dis.read(buffer)) != -1) {
-            System.out.println("Recieving File...");
-            os.write(buffer, 0, bytes);
-        }
+        return "";
     }
 }
 
+//Thread for the host server
+class HostThread extends Thread{
+    private final String EOF = "EOF";
+    private int hostPort;
+    private String hostName;
+    private String hostFileDir;
+    private ArrayList<String> hostFiles;
+    private ServerSocket serverSocket;
+    private Socket clientSocket;
+    private DataOutputStream outToClient;
+    private BufferedReader inFromClient;
 
-
-/***************************************************************************************** */
-
-
-class FTPClientServer extends Thread{
-
-  private static ServerSocket welcomeSocket;
-  private int port;
-
-  /*
-   * Main method for initiating the server. This will continue to listen to port
-   * 5081 for new connections. Once a connection has been established it will pass
-   * it off to the ClientThread class where the rest of the commands will be
-   * handled.
-   */
-  
-    public FTPClientServer(int port){
-        this.port = port;
-        this.start();
+    public HostThread(int hostPort, String hostName,  ArrayList<String> hostFiles, String hostFileDir){
+        this.hostPort = hostPort; 
+        this.hostName = hostName;
+        this.hostFiles = hostFiles;
+        this.hostFileDir = hostFileDir;
+        try{
+            serverSocket = new ServerSocket(hostPort);
+        }
+        catch(IOException ex){
+            System.out.println("Cannot setup host server: " + ex);
+        }
     }
-    public void run(){    
-        try {
-            welcomeSocket = new ServerSocket(port);
-            while (true) {
-                Socket socket = welcomeSocket.accept();
-                ClientThread thread = new ClientThread(socket);
-                thread.start();
+    public void run(){
+        try{
+            System.out.println("Waiting for clients...");
+            clientSocket = serverSocket.accept();
+            inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String fileName = inFromClient.readLine();
+            System.out.println("HERE");
+            if(fileExists(fileName)){
+                BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
+                String fileLine;
+                outToClient = new DataOutputStream(clientSocket.getOutputStream());
+                while((fileLine = fileReader.readLine()) != null){
+                    outToClient.writeBytes(fileLine + '\n');
+                }
+                outToClient.writeBytes(EOF + '\n');
+                fileReader.close();
             }
-        } catch (IOException e) {
-            System.out.println("Error Connecting...");
-            System.exit(1);
+        }
+        catch(IOException ex){
+            System.out.println("No client accepted: " + ex);
         }
     }
-}
-
-/*
- * The ClientThread class extends Thread. This class will be used
- * to handle new connections made to the server. Once the connection
- * is made, it will come to this class where all the commands will be
- * parsed. Also, all the data will flow through here.
- */
-class ClientThread extends Thread {
-
-  private Socket clientConn;
-  private DataOutputStream outToClient;
-  private BufferedReader inFromClient;
-
-  /*
-   * Constructor. This method takes in a @param Socket connectionSocket.
-   * This will then set clientConn. From here it will try to create new
-   * bufferedreaders and dataoutputstreams.
-   */
-  public ClientThread(Socket connectionSocket) {
-
-    clientConn = connectionSocket;
-    System.out.println("User Connected"+ clientConn.getInetAddress());
-
-    try {
-
-      outToClient = new DataOutputStream(clientConn.getOutputStream());
-      inFromClient = new BufferedReader(new InputStreamReader(clientConn.getInputStream()));
-
-    } catch (IOException e) {
-
-      e.printStackTrace();
-
-    }
-  }
-
-  /*
-   * This method is used by calling .start() on a new thread.
-   * This will allow the multithreading of the server class.
-   * (Multiple client connections) This method services all the
-   * commands of the server and clients.
-   */
-  public void run() {
-    File[] listOfFiles = null;
-    String nextFile = null;
-
-    try {
-
-      /*
-       * Going through all the the possible commands.
-       */
-      while (true) {
-
-        String fromClient;
-        String clientCommand;
-        byte[] data;
-        String frstln;
-        int port;
-
-        fromClient = inFromClient.readLine();
-        StringTokenizer tokens = new StringTokenizer(fromClient);
-        frstln = tokens.nextToken();
-        port = Integer.parseInt(frstln);
-        clientCommand = tokens.nextToken();
-        try {
-          nextFile = tokens.nextToken();
-        } catch (Exception e) {
+    private boolean fileExists(String fileName){
+        for(String file : hostFiles){
+            if(file.equals(fileName)){
+                return true;
+            }
         }
-
-        /*
-         * Case "retr:"
-         *
-         * This method will be entered when the user wants to
-         * return/download a file from the server. It creates input and output
-         * streams. Then it will search the directory for the file the client
-         * wants. If it has the file it will send it to them, if not an error
-         * message will be sent.
-         */
-        if (clientCommand.equals("retr:")) {
-          System.out.println("Sending file to client...");
-          Socket dataSocket = new Socket(clientConn.getInetAddress(), port);
-          DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-          FileInputStream in = null;
-
-          try {
-            in = new FileInputStream(nextFile);
-            outToClient.writeUTF("200 command ok");
-            sendFile(in, dataOutToClient);
-            in.close();
-          } catch (FileNotFoundException e) {
-              System.out.println("Failed to send file...");
-            outToClient.writeUTF("550 file not found");
-          }
-
-          dataOutToClient.close();
-          dataSocket.close();
-          System.out.println("Data Socket closed");
+        return false;
+    }
+    public void shutdown(){
+        try{
+            serverSocket.close();
+            if(inFromClient != null){
+                inFromClient.close();
+            }
         }
-        
-      }
-    } catch (Exception e) {
-      System.out.println(e);
+        catch(IOException ex){
+            System.out.println("Problem shutting down host server");
+        }
     }
-
-  }
-
-  /*
-   * This private method is used to send a file to the client. It takes as
-   * parameters a FileInputStream fis and a DataOutStream os. While its trying
-   * to send the file will update with a message indicating it is still working.
-   */
-  private static void sendFile(FileInputStream fis, DataOutputStream os) throws Exception {
-    byte[] buffer = new byte[1024];
-    int bytes = 0;
-
-    while ((bytes = fis.read(buffer)) != -1) {
-      System.out.println("Sending File...");
-      os.write(buffer, 0, bytes);
-    }
-  }
-
-  /*
-   * This private method is used to recieve a file to the client. It takes as
-   * parameters a DataOutStream os and a FileInputStream fis. While its trying
-   * to recieve the file will update with a message indicating it is still working.
-   */
-  private static void recieveFile(DataInputStream dis, FileOutputStream os) throws Exception {
-    byte[] buffer = new byte[1024];
-    int bytes;
-
-    while ((bytes = dis.read(buffer)) != -1) {
-      System.out.println("Recieving File...");
-      os.write(buffer, 0, bytes);
-    }
-  }
 }

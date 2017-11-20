@@ -13,10 +13,12 @@ public class HostController{
     private ActionListener actionListener;
     private WindowListener windowListener;
     private final String HOST_DESC = "../hostDescriptions/";
+    private boolean connected;
 
     public HostController(){
         this.hostView = new HostView();
         this.hostModel = new HostModel();
+        connected = false;
     }
 
     //Listens for GUI events
@@ -43,7 +45,7 @@ public class HostController{
                         if(connected){
 
                             //Setup host info
-                            hostModel.setup(hostname, Integer.parseInt(hostPort));
+                            connected = true;
                             hostView.getConnectButton().setEnabled(false);
                             hostView.setMessage(message);
                             hostModel.sendMessage("Register " + username + " " + hostname + " " + hostPort + " " + speed);
@@ -51,6 +53,7 @@ public class HostController{
                             hostModel.uploadFile(username);
                             hostModel.sendMessage("Upload");
                             System.out.println("Sent file info to central server");
+                            hostModel.setup(hostname, Integer.parseInt(hostPort));
                             hostView.getConnectButton().setEnabled(false);
         
                             //Host is now allowed to do keyword searches, enable search button, disable connect button
@@ -86,10 +89,13 @@ public class HostController{
                     if(command.equals("quit")){
                         hostModel.sendMessage("quit");
                         hostView.setCommandWindow("Disconnected\n");
+                        connected = false;
+                        hostModel.shutdown();
                         hostView.clear();
                     }
                     else if(!command.isEmpty() && command != null){
-                        //TODO
+                        String message = hostModel.getCommand(command);
+                        hostView.setCommandWindow(message);
                     }
                 }
             }
@@ -100,7 +106,11 @@ public class HostController{
             public void windowClosing(WindowEvent event){
                 hostView.dispose();
                 try{
-                    hostModel.sendMessage("quit");
+                    //Disconnect only if host is still connected
+                    if(connected){
+                        hostModel.sendMessage("quit");
+                        hostModel.shutdown();
+                    }
                 }
                 catch(NullPointerException ex){
                     System.out.println("Problem disconnecting from central server: " + ex);
@@ -108,15 +118,15 @@ public class HostController{
             }
             
             //Not really needed, but abstract interface methods need be overridden
-            public void windowClosed(WindowEvent event){System.out.println("GUI Closed");}
-            public void windowOpened(WindowEvent event){System.out.println("GUI Opened");}
-            public void windowIconified(WindowEvent event){System.out.println("GUI Iconified");} 
-            public void windowDeiconified(WindowEvent event){System.out.println("GUI Deiconified");}
-            public void windowActivated(WindowEvent event){System.out.println("GUI Activated");}
-            public void windowDeactivated(WindowEvent event){System.out.println("GUI Deactivated");}
-            public void windowGainedFocus(WindowEvent event){System.out.println("GUI Gained Focus");}
-            public void windowLostFocus(WindowEvent event){System.out.println("GUI Lost Focus");}
-            public void windowStateChanged(WindowEvent event){System.out.println("GUI State Change");}
+            public void windowClosed(WindowEvent event){}
+            public void windowOpened(WindowEvent event){}
+            public void windowIconified(WindowEvent event){} 
+            public void windowDeiconified(WindowEvent event){}
+            public void windowActivated(WindowEvent event){}
+            public void windowDeactivated(WindowEvent event){}
+            public void windowGainedFocus(WindowEvent event){}
+            public void windowLostFocus(WindowEvent event){}
+            public void windowStateChanged(WindowEvent event){}
         };
 
         //Add listeners to GUI components

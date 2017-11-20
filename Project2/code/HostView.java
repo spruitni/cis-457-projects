@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
@@ -65,6 +66,7 @@ public class HostView extends JFrame{
         searchButton.setEnabled(false);
         goButton.setEnabled(false);
         commandWindow.setEnabled(false);
+        commandWindow.setDisabledTextColor(Color.BLACK);
 
         //Add title borders
         topPanel.setBorder(new TitledBorder("Connection"));
@@ -138,11 +140,7 @@ public class HostView extends JFrame{
 
     //Add table with search results
     public void addTable(String[] columnNames, ArrayList<String[]> data){
-        if(tableScroll != null){
-            middlePanel.remove(tableScroll);
-        }
-        middlePanel.revalidate();
-        middlePanel.repaint();
+        refresh();
         String[][] dataArray = new String[data.size()][4];
         for(int i = 0; i < data.size(); i++){
             String[] fileInfo = data.get(i);
@@ -154,6 +152,15 @@ public class HostView extends JFrame{
         tableScroll = new JScrollPane(table);
         tableScroll.setPreferredSize(new Dimension(600,100));
         middlePanel.add(tableScroll, getGBC(0, 1, 12, 4, true, true));
+    }
+
+    //Clears the table
+    private void refresh(){
+        if(tableScroll != null){
+            middlePanel.remove(tableScroll);
+        }
+        middlePanel.revalidate();
+        middlePanel.repaint();
     }
 
     //GETTERS & SETTERS
@@ -206,8 +213,10 @@ public class HostView extends JFrame{
         keyword.setText("");
         command.setText("");
         goButton.setEnabled(false);
+        commandWindow.setText("");
         connectButton.setEnabled(true);
         searchButton.setEnabled(false);
+        refresh();
     }
 
 }
