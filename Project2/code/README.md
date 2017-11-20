@@ -14,3 +14,8 @@
 
 `java -cp ";json.jar" HostController`
 
+## To run with mac
+'java -cp .:json.jar CentralServer'
+
+'java -cp .:json.jar HostController'
+
