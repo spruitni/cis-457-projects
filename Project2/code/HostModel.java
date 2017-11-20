@@ -125,6 +125,7 @@ public class HostModel{
 
         }
         else if(commandParts[0].equals("retr")){
+            out.writeBytes(command+ "\n");
             String file = commandParts[1];
             FileOutputStream out = null;
             boolean fileExists = true;
@@ -282,32 +283,6 @@ class ClientThread extends Thread {
         }
 
         /*
-         * Case "list:"
-         *
-         * This will be entered if the user sends the command to list
-         * all the files in the server's directory. It will find all
-         * the files in the directory that end with .txt. Then it will
-         * close the dataSocket.
-         */
-        if (clientCommand.equals("list:")) {
-          System.out.println("Listing files...");
-          Socket dataSocket = new Socket(clientConn.getInetAddress(), port);
-          DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-          File folder = new File(System.getProperty("user.dir"));
-          listOfFiles = folder.listFiles();
-          for (int i = 0; i < listOfFiles.length; i++) {
-            String temp = listOfFiles[i] + "";
-            if (listOfFiles[i].isFile() && temp.endsWith(".txt")) {
-              dataOutToClient.writeUTF("file " + listOfFiles[i].getName());
-            }
-          }
-
-          dataOutToClient.close();
-          dataSocket.close();
-          System.out.println("Data Socket closed");
-        }
-
-        /*
          * Case "retr:"
          *
          * This method will be entered when the user wants to
@@ -317,7 +292,7 @@ class ClientThread extends Thread {
          * message will be sent.
          */
         if (clientCommand.equals("retr:")) {
-                    System.out.println("Sending file to client...");
+          System.out.println("Sending file to client...");
           Socket dataSocket = new Socket(clientConn.getInetAddress(), port);
           DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
           FileInputStream in = null;
@@ -336,38 +311,7 @@ class ClientThread extends Thread {
           dataSocket.close();
           System.out.println("Data Socket closed");
         }
-
-        /*
-         * Case "stor:"
-         *
-         * This method will be entered if the user wants to save a file
-         * to the server. It will open input and output streams. Then it
-         * will try to recieve the file. If the file is recieved a
-         * confirmation will appear. If not there will be an error message.
-         */
-        if (clientCommand.equals("stor:")) {
-                    System.out.println("Downloading file from host...");
-          Socket dataSocket = new Socket(clientConn.getInetAddress(), port);
-          DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-          DataInputStream inData = new DataInputStream(dataSocket.getInputStream());
-          File f = new File(nextFile);
-          FileOutputStream out = null;
-          try {
-            out = new FileOutputStream(f);
-            System.out.println("Made it stor: ");
-            recieveFile(inData, out);
-            outToClient.writeUTF("200 command ok");
-            out.close();
-          } catch (FileNotFoundException e) {
-            outToClient.writeUTF("502 command not implemented");
-                        System.out.println("File not downloaded...");
-          }
-
-          dataOutToClient.close();
-          dataSocket.close();
-          System.out.println("Data Socket closed");
-
-        }
+        
       }
     } catch (Exception e) {
       System.out.println(e);
