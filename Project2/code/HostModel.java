@@ -174,9 +174,10 @@ class HostThread extends Thread{
     private String hostFileDir;
     private ArrayList<String> hostFiles;
     private ServerSocket serverSocket;
-    private Socket clientSocket;
+    //private Socket clientSocket;
     private DataOutputStream outToClient;
     private BufferedReader inFromClient;
+    private boolean cont = true;
 
     public HostThread(int hostPort, String hostName,  ArrayList<String> hostFiles, String hostFileDir){
         this.hostPort = hostPort; 
@@ -191,29 +192,33 @@ class HostThread extends Thread{
         }
     }
     public void run(){
-        try{
-            System.out.println("Waiting for clients...");
-            clientSocket = serverSocket.accept();
-            inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String fileName = inFromClient.readLine();
-            System.out.println("HERE");
-            BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
-            outToClient = new DataOutputStream(clientSocket.getOutputStream());
-            if(fileExists(fileName)){
-                String fileLine;
-                outToClient.writeBytes(FILE_FOUND + '\n');
-                while((fileLine = fileReader.readLine()) != null){
-                    outToClient.writeBytes(fileLine + '\n');
+        while(cont){
+            try{
+                Socket clientSocket;
+                System.out.println("Waiting for clients...");
+                clientSocket = serverSocket.accept();
+                inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                String fileName = inFromClient.readLine();
+                System.out.println("HERE");
+                BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
+                outToClient = new DataOutputStream(clientSocket.getOutputStream());
+                if(fileExists(fileName)){
+                    String fileLine;
+                    outToClient.writeBytes(FILE_FOUND + '\n');
+                    while((fileLine = fileReader.readLine()) != null){
+                        outToClient.writeBytes(fileLine + '\n');
+                    }
+                    outToClient.writeBytes(EOF + '\n');
                 }
-                outToClient.writeBytes(EOF + '\n');
+                else{
+                    outToClient.writeBytes(FILE_NOT_FOUND + '\n');    
+                }
+                fileReader.close();
+                clientSocket.close();
             }
-            else{
-                outToClient.writeBytes(FILE_NOT_FOUND + '\n');    
+            catch(IOException ex){
+                System.out.println("No client accepted: " + ex);
             }
-            fileReader.close();
-        }
-        catch(IOException ex){
-            System.out.println("No client accepted: " + ex);
         }
     }
     private boolean fileExists(String fileName){
@@ -226,6 +231,7 @@ class HostThread extends Thread{
     }
     public void shutdown(){
         try{
+            cont = false;
             serverSocket.close();
             if(inFromClient != null){
                 inFromClient.close();

@@ -86,6 +86,7 @@ public class HostController{
                 if(event.getSource() == hostView.getGoButton()){
                     String command = hostView.getCommand();
                     hostView.setCommandWindow(">>> " + command + '\n');
+                    hostView.clearCommand();
                     if(command.equals("quit")){
                         hostModel.sendMessage("quit");
                         hostView.setCommandWindow("Disconnected\n");

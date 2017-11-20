@@ -201,6 +201,9 @@ public class HostView extends JFrame{
     public String getCommand(){
         return command.getText();
     }
+    public void clearCommand(){
+        command.setText("");
+    }
     public void setCommandWindow(String c){
         commandWindow.append(c);
     }
