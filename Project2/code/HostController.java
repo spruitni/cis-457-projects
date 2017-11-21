@@ -6,6 +6,13 @@ import java.awt.event.WindowEvent;
 import java.util.*;
 import java.io.*;
 
+/*
+ * This class is the all the methods that are associated with what each
+ * individual user will do on the server and connecting to other users
+ * to download files. 
+ *
+ * Note: This file will have to be running to initiate the UI.
+ */
 public class HostController{
 
     private HostModel hostModel;

@@ -9,6 +9,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.ArrayList;
 
+/*
+ * The actual components of the user interface.
+ */
 public class HostView extends JFrame{
     
     private JLabel serverLabel, portLabel, userLabel, hostLabel, 

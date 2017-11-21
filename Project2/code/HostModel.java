@@ -6,7 +6,10 @@ import java.lang.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
-//Class performs host functions
+/*
+ * These classes are used by the HostController to execute different
+ * commands with the Napster server as well as other users servers. 
+ */
 public class HostModel{
     
     //Class attributes
@@ -172,7 +175,10 @@ public class HostModel{
     }
 }
 
-//Thread for the host server
+/*
+ * This class is started when the user connects to another user to download.
+ * It will allow the user to have multiple connections.
+ */
 class HostThread extends Thread{
     private final String EOF = "EOF";
     private final String FILE_FOUND = "FILE_FOUND";

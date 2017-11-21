@@ -8,6 +8,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+
+/* 
+ * This CentralServer class is all information and event handling for
+ * the central Napster Server. All users will connect to this and be
+ * able to search all other user's files. This will keep an updated
+ * .json file with arraylists for each user.
+ *
+ * Note: this must be running for the HostController's to be able to
+ * connect to the server.
+ */
 public class CentralServer{
 
     //Connection port and  server socket
@@ -39,6 +49,11 @@ public class CentralServer{
     }
 }
 
+/*
+ * This ClientHandler is started once a user connects to the server.
+ * This class allows the centralserver to have multiple people connect
+ * to it.
+ */
 class ClientHandler extends Thread{
     
     //Control connection socket 
