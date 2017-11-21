@@ -115,7 +115,7 @@ public class HostView extends JFrame{
         this.add(mainPanel);
         this.setSize(900,700);
         this.getContentPane();   
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
 

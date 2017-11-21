@@ -111,6 +111,7 @@ public class HostController{
                     if(connected){
                         hostModel.sendMessage("quit");
                         hostModel.shutdown();
+                        connected= false;
                     }
                 }
                 catch(NullPointerException ex){
@@ -134,7 +135,6 @@ public class HostController{
         hostView.getConnectButton().addActionListener(actionListener);
         hostView.getSearchButton().addActionListener(actionListener);
         hostView.getGoButton().addActionListener(actionListener);
-        hostView.addWindowListener(windowListener);
     }
 
     //Validates user input

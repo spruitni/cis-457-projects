@@ -54,6 +54,14 @@ public class HostModel{
         if(hostThread != null){
             hostThread.shutdown();
         }
+        if(hostSocket != null){
+            try{
+                hostSocket.close();
+            }
+            catch(IOException ex){
+                System.out.println("Error disconnecting host");
+            }
+        }
     }
 
     //Send message to server (username, hostname, speed, )
@@ -199,7 +207,6 @@ class HostThread extends Thread{
                 clientSocket = serverSocket.accept();
                 inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String fileName = inFromClient.readLine();
-                System.out.println("HERE");
                 BufferedReader fileReader = new BufferedReader(new FileReader(hostFileDir + fileName));
                 outToClient = new DataOutputStream(clientSocket.getOutputStream());
                 if(fileExists(fileName)){
