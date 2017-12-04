@@ -50,7 +50,8 @@ public class ChessPanel extends JPanel {
 	private JButton quit;
 	private JButton reset;
 	private JButton undo;
-	private JButton redo;
+	//private JButton redo;
+	private JButton push; // new kung-fo
 	private int count=0;
 	private final int dimensions=8;
 	private int player1W=0;
@@ -75,7 +76,8 @@ public class ChessPanel extends JPanel {
 		quit = new JButton("Quit");
 		reset = new JButton("Reset");
 		undo = new JButton("Undo");
-		redo = new JButton("Redo");
+		//redo = new JButton("Redo");
+        push = new JButton("Push");
 		newBoard();
 
 	}
@@ -88,7 +90,8 @@ public class ChessPanel extends JPanel {
 		quit.addActionListener(buttonListener);
 		reset.addActionListener(buttonListener);
 		undo.addActionListener(buttonListener);
-		redo.addActionListener(buttonListener);
+		//redo.addActionListener(buttonListener);
+        push.addActionListener(buttonListener);
 		reset.setPreferredSize(new Dimension(15, 25));
 		center.setLayout(new GridLayout(dimensions, dimensions));
 		board = new JButton[dimensions][dimensions];
@@ -113,7 +116,8 @@ public class ChessPanel extends JPanel {
 				center.add(board[row][col]);
 			}
 		playerTurn = new JLabel("It is "+ model.player +"'s turn.");
-		north.add(redo, BorderLayout.EAST);
+		//north.add(redo, BorderLayout.EAST);
+        north.add(push, BorderLayout.EAST); //new kung-fo
 		north.add(undo, BorderLayout.WEST);
 		north.add(playerTurn, BorderLayout.CENTER);
 		south.add(player1, BorderLayout.WEST);
@@ -251,6 +255,12 @@ public class ChessPanel extends JPanel {
 		public void actionPerformed(ActionEvent event) {
 
 			// complete this
+            if(event.getSource() == push){
+                Move move;
+                int moveRow = model.moves[model.getCounter()].fromRow;
+                int moveCol = model.moves[model.getCounter()].fromColumn;
+
+            }
 			if(event.getSource() == undo){
 				int counter=model.getCounter()-1;
 				Move move;
@@ -300,7 +310,7 @@ public class ChessPanel extends JPanel {
 				}
 
 			}
-			else if(event.getSource() == redo){
+			/*else if(event.getSource() == redo){
 				Move move= model.moves[model.getCounter()];
 				if( move != null){
 					model.setHasMoved(move, false);
@@ -331,7 +341,7 @@ public class ChessPanel extends JPanel {
 					model.nextPlayer();
 					pawnUpgrade();
 				}
-			}
+			}*/
 			else if(event.getSource() == quit)
 				System.exit(0);
 			else if(event.getSource()==reset)
