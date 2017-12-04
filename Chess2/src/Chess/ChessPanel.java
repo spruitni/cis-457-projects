@@ -59,6 +59,10 @@ public class ChessPanel extends JPanel {
 	private int player2W=0;
 	private int fromRow, fromCol;
 	private boolean firstClick = true;
+	private DataOutputStream dos;
+	private BufferedReader br;
+	private ServerSocket serverSocket;
+	private Socket clientSocket;
 
 	// declare other instance variables as needed
 	
@@ -146,22 +150,33 @@ public class ChessPanel extends JPanel {
 		south.repaint();
 	}
 	
-	public void streams() {
-	        
-	        try {
-	            ServerSocket serverSocket = new ServerSocket(8000);
-	            Socket clientSocket = serverSocket.accept();
-	            System.out.println("Connection created");
-	            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
-	            BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-	        }
-	        catch(IOException ex){
-	            System.out.println("Cannot Setup server");
-	            System.exit(1);
-	        }
-	        //this.control(dos);
-	        //this.listen(br);
-	        
+	public void streams(boolean isHost, String ipAddress) {
+		
+		if(isHost){
+		    try {
+	            	serverSocket = new ServerSocket(8000);
+	            	clientSocket = serverSocket.accept();
+	            	System.out.println("Connection created");
+	            	dos = new DataOutputStream(clientSocket.getOutputStream());
+	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	            }
+	            catch(IOException ex){
+	            	System.out.println("Cannot Setup server");
+	            	System.exit(1);
+	            }			
+		}
+		else{
+		    try {
+	            	clientSocket = new Socket(8000, ipAddress);
+	            	System.out.println("Connection created");
+	            	dos = new DataOutputStream(clientSocket.getOutputStream());
+	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	            }
+	            catch(IOException ex){
+	            	System.out.println("Cannot Setup server");
+	            	System.exit(1);
+	            }
+		}
 	}
 	
 	public void onlineMoves() {
