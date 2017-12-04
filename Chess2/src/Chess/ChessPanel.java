@@ -1,6 +1,8 @@
 package Chess;
 
 import java.awt.BorderLayout;
+import java.io.*;
+import java.net.*;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -50,8 +52,7 @@ public class ChessPanel extends JPanel {
 	private JButton quit;
 	private JButton reset;
 	private JButton undo;
-	//private JButton redo;
-	private JButton push; // new kung-fo
+	private JButton redo;
 	private int count=0;
 	private final int dimensions=8;
 	private int player1W=0;
@@ -60,7 +61,9 @@ public class ChessPanel extends JPanel {
 	private boolean firstClick = true;
 
 	// declare other instance variables as needed
-
+	
+	DataOutputStream dos;
+	BufferedReader br;
 	private ButtonListener buttonListener = new ButtonListener();
 
 /**********************************************************************
@@ -76,8 +79,7 @@ public class ChessPanel extends JPanel {
 		quit = new JButton("Quit");
 		reset = new JButton("Reset");
 		undo = new JButton("Undo");
-		//redo = new JButton("Redo");
-        push = new JButton("Push");
+		redo = new JButton("Redo");
 		newBoard();
 
 	}
@@ -90,8 +92,7 @@ public class ChessPanel extends JPanel {
 		quit.addActionListener(buttonListener);
 		reset.addActionListener(buttonListener);
 		undo.addActionListener(buttonListener);
-		//redo.addActionListener(buttonListener);
-        push.addActionListener(buttonListener);
+		redo.addActionListener(buttonListener);
 		reset.setPreferredSize(new Dimension(15, 25));
 		center.setLayout(new GridLayout(dimensions, dimensions));
 		board = new JButton[dimensions][dimensions];
@@ -116,8 +117,7 @@ public class ChessPanel extends JPanel {
 				center.add(board[row][col]);
 			}
 		playerTurn = new JLabel("It is "+ model.player +"'s turn.");
-		//north.add(redo, BorderLayout.EAST);
-        north.add(push, BorderLayout.EAST); //new kung-fo
+		north.add(redo, BorderLayout.EAST);
 		north.add(undo, BorderLayout.WEST);
 		north.add(playerTurn, BorderLayout.CENTER);
 		south.add(player1, BorderLayout.WEST);
@@ -145,6 +145,32 @@ public class ChessPanel extends JPanel {
 		center.repaint();
 		south.repaint();
 	}
+	
+	public void streams() {
+	        
+	        try {
+	            ServerSocket serverSocket = new ServerSocket(8000);
+	            Socket clientSocket = serverSocket.accept();
+	            System.out.println("Connection created");
+	            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+	            BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	        }
+	        catch(IOException ex){
+	            System.out.println("Cannot Setup server");
+	            System.exit(1);
+	        }
+	        //this.control(dos);
+	        //this.listen(br);
+	        
+	}
+	
+	public void onlineMoves() {
+		
+		board[1][1].doClick();
+		board[2][1].doClick();
+		
+	}
+	
 /**********************************************************************
  * Display board displays the images and updates them as they move 
  * around the board.
@@ -254,102 +280,30 @@ public class ChessPanel extends JPanel {
 
 		public void actionPerformed(ActionEvent event) {
 
-			// complete this
-            if(event.getSource() == push){
-                int fRow = model.moves[model.getCounter()-1].fromRow;
+			// retrieve move and execute
+			if(event.getSource() == undo){
+				
+				onlineMoves();
+
+			}
+			// send the move
+			else if(event.getSource() == redo){
+				
+				int fRow = model.moves[model.getCounter()-1].fromRow;
                 int fCol = model.moves[model.getCounter()-1].fromColumn;
                 int tRow = model.moves[model.getCounter()-1].toRow;
                 int tCol = model.moves[model.getCounter()-1].toColumn;
-                Move move = new Move(tRow, tCol, fRow, fCol);
-				model.move(move);
-				// do click
-
-            }
-			if(event.getSource() == undo){
-				int counter=model.getCounter()-1;
-				Move move;
-				for(int i = model.getCounter(); i<1000; i++){
-                    model.moves[i+1]=null;
-                }
-				if(counter>=0){
-					model.unMove(model.moves[counter], 
-							model.killedPieces[counter]);
-					model.nextPlayer();
-					model.setCounter(counter);
-					model.setHasMoved(model.moves[counter], false);
-					
-					move = model.moves[counter];
-					if(model.typeOfMove[counter]==2){
-						if(move.toColumn==1){
-							model.unMove(
-									new Move(move.fromRow,0,
-											move.fromRow,2), 
-									model.killedPieces[counter]);
-						}
-						else if(move.toColumn==5)
-							model.unMove(
-									new Move(move.fromRow,7
-											,move.fromRow,4),
-									model.killedPieces[counter]);
-					}	
-					else if(model.typeOfMove[counter]==3){
-						if(move.toRow==2){
-							model.move(
-									new Move(move.toRow,move.toColumn,
-											move.fromRow,
-											move.toColumn));
-						}
-						else if(move.toRow==5){
-							model.move(
-									new Move(move.toRow,move.toColumn,
-											move.fromRow,
-											move.toColumn));
-						}
-					}
-					else if(model.typeOfMove[counter+1]==4){
-						model.removePiece(move.fromRow, 
-								move.fromColumn);
-						model.newPawn(move.fromRow, move.fromColumn);
-					}
-				}
-
+                
+                
+				
+				
 			}
-			/*else if(event.getSource() == redo){
-				Move move= model.moves[model.getCounter()];
-				if( move != null){
-					model.setHasMoved(move, false);
-					model.move(move);
-					if(model.typeOfMove[model.getCounter()]==2){
-						if(move.toColumn==1)
-							model.move(new Move(move.fromRow,
-									0,move.fromRow,2));
-						if(move.toColumn==5)
-							model.move(new Move(move.fromRow,
-									7,move.fromRow,4));
-					}
-
-					else if(model.typeOfMove[model.getCounter()]==3){
-						if(move.toRow==2){
-							model.killedPieces[model.getCounter()]=
-									model.pieceAt(move.toRow+1, 
-											move.toColumn);
-							model.removePiece(move.toRow+1,
-									move.toColumn);
-						}
-						if(move.toRow==5){
-							model.removePiece(move.toRow-1,
-									move.toColumn);
-						}
-					}
-					model.setCounter(model.getCounter()+1);
-					model.nextPlayer();
-					pawnUpgrade();
-				}
-			}*/
-			else if(event.getSource() == quit)
+			else if(event.getSource() == quit) {
 				System.exit(0);
-			else if(event.getSource()==reset)
+				}
+			else if(event.getSource()==reset) {
 				resetBoard();
+			}
 			else if(firstClick==true){
 				for(int row=0; row<dimensions; row++)
 					for(int col=0; col<dimensions; col++)
