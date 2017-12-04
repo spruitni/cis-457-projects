@@ -63,15 +63,14 @@ public class ChessPanel extends JPanel {
 	private BufferedReader br;
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
+	private boolean isHost;
 
 	// declare other instance variables as needed
 	
-	DataOutputStream dos;
-	BufferedReader br;
 	private ButtonListener buttonListener = new ButtonListener();
 
 /**********************************************************************
- *Chess Panel instantiates all the inital JPanels, JLabels, and JButtons
+ *Chess Panel instantiates all the initial JPanels, JLabels, and JButtons
  *********************************************************************/ 
 	public ChessPanel() {
 		// complete this
@@ -83,7 +82,8 @@ public class ChessPanel extends JPanel {
 		quit = new JButton("Quit");
 		reset = new JButton("Reset");
 		undo = new JButton("Undo");
-		redo = new JButton("Redo");
+		redo = new JButton("Redo");	
+		streams();
 		newBoard();
 
 	}
@@ -150,10 +150,12 @@ public class ChessPanel extends JPanel {
 		south.repaint();
 	}
 	
-	public void streams(boolean isHost, String ipAddress) {
-		
-		if(isHost){
-		    try {
+	public void streams() {
+		int type= JOptionPane.showConfirmDialog(null,"Would you like to host a game?", null, JOptionPane.YES_NO_OPTION);
+
+		if (type == JOptionPane.YES_OPTION) {
+			try {
+					isHost = true;
 	            	serverSocket = new ServerSocket(8000);
 	            	clientSocket = serverSocket.accept();
 	            	System.out.println("Connection created");
@@ -163,26 +165,54 @@ public class ChessPanel extends JPanel {
 	            catch(IOException ex){
 	            	System.out.println("Cannot Setup server");
 	            	System.exit(1);
-	            }			
-		}
-		else{
-		    try {
-	            	clientSocket = new Socket(8000, ipAddress);
-	            	System.out.println("Connection created");
-	            	dos = new DataOutputStream(clientSocket.getOutputStream());
-	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-	            }
-	            catch(IOException ex){
-	            	System.out.println("Cannot Setup server");
-	            	System.exit(1);
 	            }
 		}
+		else if(type == JOptionPane.NO_OPTION) {
+			try {
+				isHost = false;
+ 		    	String ipAddress = JOptionPane.showInputDialog("Enter Host IP");
+ 	            	clientSocket = new Socket(ipAddress, 8000);
+ 	            	System.out.println("Connection created");
+ 	            	dos = new DataOutputStream(clientSocket.getOutputStream());
+ 	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+ 	            }
+ 	            catch(IOException ex){
+ 	            	System.out.println("Cannot Setup server");
+ 	            }  
+		}	 		
+	}
+	// Sending move coordinates to board
+	public void onlineMoves(int fromRow, int fromCol, int toRow, int toCol) {
+		
+		//board[1][1].doClick();
+		//board[2][1].doClick();
+		
+		try {
+			
+			dos.writeBytes(fromRow + " " + fromCol + " " + toRow + " " + toCol + "\n");
+			System.out.println(fromRow + " " + fromCol + " " + toRow + " " + toCol);
+			
+		} catch (IOException ex) {
+			System.out.println("Not Sent");
+		}
+			
 	}
 	
-	public void onlineMoves() {
+	public void readMoves() {
 		
-		board[1][1].doClick();
-		board[2][1].doClick();
+		try {
+			String[] coordinates = br.readLine().split("\\s");
+			
+			int netFromRow = Integer.parseInt(coordinates[0]);
+			int netFromCol = Integer.parseInt(coordinates[1]);
+			int netToRow = Integer.parseInt(coordinates[2]);
+			int netToCol = Integer.parseInt(coordinates[3]);
+			
+			board[netFromRow][netFromCol].doClick();
+			board[netToRow][netToCol].doClick();
+		} catch (IOException ex) {
+			System.out.println("Not read");
+		}
 		
 	}
 	
@@ -298,7 +328,7 @@ public class ChessPanel extends JPanel {
 			// retrieve move and execute
 			if(event.getSource() == undo){
 				
-				onlineMoves();
+				readMoves();
 
 			}
 			// send the move
@@ -389,7 +419,8 @@ public class ChessPanel extends JPanel {
 									model.setHasMoved(move1, true);
 									model.move(move1);
 									model.nextPlayer();
-									pawnUpgrade();
+									pawnUpgrade();	
+								onlineMoves(fromRow, fromCol, row, col);
 								}
 								else{
 									JOptionPane.showMessageDialog(null,
