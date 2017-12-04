@@ -256,9 +256,13 @@ public class ChessPanel extends JPanel {
 
 			// complete this
             if(event.getSource() == push){
-                Move move;
-                int moveRow = model.moves[model.getCounter()].fromRow;
-                int moveCol = model.moves[model.getCounter()].fromColumn;
+                int fRow = model.moves[model.getCounter()-1].fromRow;
+                int fCol = model.moves[model.getCounter()-1].fromColumn;
+                int tRow = model.moves[model.getCounter()-1].toRow;
+                int tCol = model.moves[model.getCounter()-1].toColumn;
+                Move move = new Move(tRow, tCol, fRow, fCol);
+				model.move(move);
+				// do click
 
             }
 			if(event.getSource() == undo){
