@@ -17,8 +17,8 @@ import javax.swing.*;
  * The Panel of the projects makes the game come to life. I put all the
  * pieces on the board and displays it to the players for them to 
  * interact with it.
- * @author Brendan Nahed Daniel Wynalda Estavan Mares
- * @version (3/22/2016)
+ * @author Brenden Nahed, Jake Geers, Nathan Lindenbaum, Nick Spruit
+ * @version (12/3/2017)
  *********************************************************************/ 
 public class ChessPanel extends JPanel {
 
@@ -149,7 +149,9 @@ public class ChessPanel extends JPanel {
 		center.repaint();
 		south.repaint();
 	}
-	
+/**********************************************************************
+*Steams sets up the tcp connection with the opponent.
+*********************************************************************/
 	public void streams() {
 		int type= JOptionPane.showConfirmDialog(null,"Would you like to host a game?", null, JOptionPane.YES_NO_OPTION);
 
@@ -188,6 +190,10 @@ public class ChessPanel extends JPanel {
 			frame.dispose();
 		}
 	}
+ /**********************************************************************
+ *onlineMoves sends the move to the opponent through the TCP connection
+ * established in streams.
+ **********************************************************************/
 	// Sending move coordinates to board
 	public void onlineMoves(int fromRow, int fromCol, int toRow, int toCol) {
 		//board[1][1].doClick();
@@ -204,16 +210,38 @@ public class ChessPanel extends JPanel {
 			}
 		}
 	}
+/**********************************************************************
+ * playerQuit sends the quit message to the opponent.
+ **********************************************************************/
 	
-	public void playerQuit(String quit) {
+	public void playerQuit() {
 		
 		try {
-			dos.writeBytes(quit);
+			dos.writeBytes("quit");
 		} catch (IOException ex) {
 			System.out.println("Not Sent");
 		}
 		
 	}
+
+	public void quit(){
+		try {
+			br.close();
+			dos.close();
+			clientSocket.close();
+			try {
+				serverSocket.close();
+			}catch(NullPointerException ex){
+
+			}
+		}catch(IOException ex){
+
+		}
+	}
+/**********************************************************************
+ * readMoves reads in from the buffered stream the opponent's last
+ * move.
+ **********************************************************************/
 	
 	public void readMoves() {
 
@@ -221,8 +249,8 @@ public class ChessPanel extends JPanel {
 			String[] coordinates = br.readLine().split("\\s");
 			
 			if (coordinates[0].equals("quit")){
-				
-				System.exit(1);
+				quit();
+				frame.dispose();
 				
 			}
 			
@@ -369,19 +397,8 @@ public class ChessPanel extends JPanel {
 				
 			}
 			else if(event.getSource() == quit) {
-				try {
-
-					br.close();
-					dos.close();
-					clientSocket.close();
-					try {
-						serverSocket.close();
-					}catch(NullPointerException ex){
-
-					}
-				}catch(IOException ex){
-
-				}
+				playerQuit();
+				quit();
 					frame.dispose();
 
 				}
