@@ -8,9 +8,10 @@ import javax.swing.JFrame;
  *********************************************************************/ 
 public class ChessGUI {
 
-	public static void main(String[] args) {
+	public ChessGUI() {
+		
 		JFrame frame = new JFrame("Chess Game");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		ChessPanel panel = new ChessPanel();
 		frame.getContentPane().add(panel);
@@ -18,5 +19,7 @@ public class ChessGUI {
 		frame.setSize(650,740);
 		frame.setResizable(false);
 		frame.setVisible(true);
+		
 	}
+	
 }

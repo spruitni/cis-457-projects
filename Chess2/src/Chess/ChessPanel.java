@@ -160,7 +160,7 @@ public class ChessPanel extends JPanel {
 			try {
 					playerTurn = new JLabel("Host Player: White");
 					isHost = true;
-	            	serverSocket = new ServerSocket(8000);
+	            	serverSocket = new ServerSocket(5050);
 	            	clientSocket = serverSocket.accept();
 	            	System.out.println("Connection created");
 	            	dos = new DataOutputStream(clientSocket.getOutputStream());
@@ -177,7 +177,7 @@ public class ChessPanel extends JPanel {
 				playerTurn = new JLabel("Client Player: Black");
 				isHost = false;
  		    	String ipAddress = JOptionPane.showInputDialog("Enter Host IP");
- 	            	clientSocket = new Socket(ipAddress, 8000);
+ 	            	clientSocket = new Socket(ipAddress, 5050);
  	            	System.out.println("Connection created");
  	            	dos = new DataOutputStream(clientSocket.getOutputStream());
  	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -205,10 +205,26 @@ public class ChessPanel extends JPanel {
 		}
 	}
 	
-	public void readMoves() {
+	public void playerQuit(String quit) {
 		
 		try {
+			dos.writeBytes(quit);
+		} catch (IOException ex) {
+			System.out.println("Not Sent");
+		}
+		
+	}
+	
+	public void readMoves() {
+
+		try {
 			String[] coordinates = br.readLine().split("\\s");
+			
+			if (coordinates[0].equals("quit")){
+				
+				System.exit(1);
+				
+			}
 			
 			int netFromRow = Integer.parseInt(coordinates[0]);
 			int netFromCol = Integer.parseInt(coordinates[1]);
@@ -220,6 +236,7 @@ public class ChessPanel extends JPanel {
 			writeMove = true;
 		} catch (IOException ex) {
 			System.out.println("Not read");
+			System.exit(1);
 		}
 		
 	}
@@ -352,7 +369,17 @@ public class ChessPanel extends JPanel {
 				
 			}
 			else if(event.getSource() == quit) {
-				System.exit(0);
+				try {
+					playerQuit("quit" + "\n");
+					dos.close();
+					br.close();
+					serverSocket.close();
+					clientSocket.close();
+					
+				} catch (IOException e){
+					
+				}
+				System.exit(1);
 				}
 			else if(event.getSource()==reset) {
 				resetBoard();
@@ -521,7 +548,7 @@ public class ChessPanel extends JPanel {
 							}
 							if(noneLeft == true ){
 								JOptionPane.showMessageDialog(null,""
-										+ "You have bo piece available "
+										+ "You have no piece available "
 										+ "so you get an extra Queen");
 								model.pawnUpgrade(0,
 										0, col);

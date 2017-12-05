@@ -16,9 +16,11 @@ public class GVGameHub{
             String message = getUserInput("Would you like to play Chess(c) or Hangman(h) or Quit(q)? ");
             if(message.equals("CHESS") || message.equals("C")){
                 setUp("CHESS");
+                cont = false;
             }
             else if(message.equals("HANGMAN") || message.equals("H")){
                 setUp("HANGMAN");
+                cont = false;
             }
             else if(message.equals("QUIT") || message.equals("Q")){
                 System.out.println("Goodbye...");
