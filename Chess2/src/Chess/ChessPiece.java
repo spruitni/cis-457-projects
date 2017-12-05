@@ -1,8 +1,8 @@
 package Chess;
 /**********************************************************************
  * ChessPiece class that impletments IChessPiece
- * @author Brendan Nahed Daniel Wynalda Estavan Mares
- * @version (3/22/2016)
+ * @author Brenden Nahed, Jake Geers, Nathan Lindenbaum, Nick Spruit
+ * @version (12/3/2017)
  *********************************************************************/ 
 public abstract class ChessPiece implements IChessPiece{
 	private Player owner;

@@ -1,8 +1,8 @@
 package Chess;
 /**********************************************************************
  *The move Class handles the moving of the pieces
- * @author Brendan Nahed Daniel Wynalda Estavan Mares
- * @version (3/22/2016)
+ * @author Brenden Nahed, Jake Geers, Nathan Lindenbaum, Nick Spruit
+ * @version (12/3/2017)
  *********************************************************************/ 
 public class Move {
 

@@ -10,8 +10,8 @@ import javax.swing.JOptionPane;
  * the pieces, check if moves are valid. It also runs the undo and redo
  * button. Handles the Pawn Upgrade. The code brings all the pieces 
  * together and has them work together.
- * @author Brendan Nahed Daniel Wynalda Estavan Mares
- * @version (3/22/2016)
+ * @author Brenden Nahed, Jake Geers, Nathan Lindenbaum, Nick Spruit
+ * @version (12/3/2017)
  *********************************************************************/
 
 public class ChessModel implements IChessModel {
@@ -322,6 +322,9 @@ public class ChessModel implements IChessModel {
     public Player currentPlayer() {
         return player;
     }
+    /**********************************************************************
+     * Allows the user to set the current player.
+     *********************************************************************/
     public void setCurrentPlayer(Player p){
         player = p;
     }
