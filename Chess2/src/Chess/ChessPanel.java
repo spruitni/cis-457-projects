@@ -58,6 +58,7 @@ public class ChessPanel extends JPanel {
 	private int player1W=0;
 	private int player2W=0;
 	private int fromRow, fromCol;
+	private int sFromRow, sFromCol, sToRow, sToCol;
 	private boolean firstClick = true;
 	private DataOutputStream dos;
 	private BufferedReader br;
@@ -65,6 +66,7 @@ public class ChessPanel extends JPanel {
 	private Socket clientSocket;
 	private boolean isHost;
 	private boolean writeMove;
+	private boolean performSend = false;
 
 	// declare other instance variables as needed
 	
@@ -188,7 +190,6 @@ public class ChessPanel extends JPanel {
 	}
 	// Sending move coordinates to board
 	public void onlineMoves(int fromRow, int fromCol, int toRow, int toCol) {
-		
 		//board[1][1].doClick();
 		//board[2][1].doClick();
 		if (writeMove) {
@@ -427,7 +428,7 @@ public class ChessPanel extends JPanel {
 									model.move(move1);
 									model.nextPlayer();
 									pawnUpgrade();	
-								//onlineMoves(fromRow, fromCol, row, col);
+								onlineMoves(fromRow, fromCol, row, col);
 								}
 								else{
 									JOptionPane.showMessageDialog(null,
@@ -443,8 +444,12 @@ public class ChessPanel extends JPanel {
 									fromCol=col;
 								}
 							}
-							displayBoard();
-							onlineMoves(fromRow, fromCol, row, col);
+							//sFromRow = fromRow;
+							//sFromCol = fromCol;
+							//sToRow = row;
+							//sToCol = col;
+							//performSend = true;
+							//onlineMoves(fromRow, fromCol, row, col);
 						}
 				if(model.isComplete()){
 					if(model.player ==Player.WHITE){
@@ -484,6 +489,7 @@ public class ChessPanel extends JPanel {
 			}
 			displayBoard();
 		}
+
 	}
 /**********************************************************************
  * PawnUpgrade checks if a pawn has made it across the board then 
