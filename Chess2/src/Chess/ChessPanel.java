@@ -252,16 +252,17 @@ public class ChessPanel extends JPanel {
 				quit();
 				frame.dispose();
 				
+			} else{
+
+				int netFromRow = Integer.parseInt(coordinates[0]);
+				int netFromCol = Integer.parseInt(coordinates[1]);
+				int netToRow = Integer.parseInt(coordinates[2]);
+				int netToCol = Integer.parseInt(coordinates[3]);
+
+				board[netFromRow][netFromCol].doClick();
+				board[netToRow][netToCol].doClick();
+				writeMove = true;
 			}
-			
-			int netFromRow = Integer.parseInt(coordinates[0]);
-			int netFromCol = Integer.parseInt(coordinates[1]);
-			int netToRow = Integer.parseInt(coordinates[2]);
-			int netToCol = Integer.parseInt(coordinates[3]);
-			
-			board[netFromRow][netFromCol].doClick();
-			board[netToRow][netToCol].doClick();
-			writeMove = true;
 		} catch (IOException ex) {
 			System.out.println("Not read");
 			System.exit(1);
