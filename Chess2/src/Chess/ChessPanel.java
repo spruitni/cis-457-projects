@@ -64,6 +64,7 @@ public class ChessPanel extends JPanel {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	private boolean isHost;
+	private boolean writeMove;
 
 	// declare other instance variables as needed
 	
@@ -120,7 +121,7 @@ public class ChessPanel extends JPanel {
 				}
 				center.add(board[row][col]);
 			}
-		playerTurn = new JLabel("It is "+ model.player +"'s turn.");
+		//playerTurn = new JLabel("It is "+ model.player +"'s turn.");
 		north.add(redo, BorderLayout.EAST);
 		north.add(undo, BorderLayout.WEST);
 		north.add(playerTurn, BorderLayout.CENTER);
@@ -155,12 +156,14 @@ public class ChessPanel extends JPanel {
 
 		if (type == JOptionPane.YES_OPTION) {
 			try {
+					playerTurn = new JLabel("Host Player: White");
 					isHost = true;
 	            	serverSocket = new ServerSocket(8000);
 	            	clientSocket = serverSocket.accept();
 	            	System.out.println("Connection created");
 	            	dos = new DataOutputStream(clientSocket.getOutputStream());
 	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	            	writeMove = true;
 	            }
 	            catch(IOException ex){
 	            	System.out.println("Cannot Setup server");
@@ -169,12 +172,14 @@ public class ChessPanel extends JPanel {
 		}
 		else if(type == JOptionPane.NO_OPTION) {
 			try {
+				playerTurn = new JLabel("Client Player: Black");
 				isHost = false;
  		    	String ipAddress = JOptionPane.showInputDialog("Enter Host IP");
  	            	clientSocket = new Socket(ipAddress, 8000);
  	            	System.out.println("Connection created");
  	            	dos = new DataOutputStream(clientSocket.getOutputStream());
  	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+ 	            	writeMove = false;
  	            }
  	            catch(IOException ex){
  	            	System.out.println("Cannot Setup server");
@@ -186,16 +191,17 @@ public class ChessPanel extends JPanel {
 		
 		//board[1][1].doClick();
 		//board[2][1].doClick();
-		
-		try {
+		if (writeMove) {
+			try {
 			
-			dos.writeBytes(fromRow + " " + fromCol + " " + toRow + " " + toCol + "\n");
-			System.out.println(fromRow + " " + fromCol + " " + toRow + " " + toCol);
-			
-		} catch (IOException ex) {
-			System.out.println("Not Sent");
+				dos.writeBytes(fromRow + " " + fromCol + " " + toRow + " " + toCol + "\n");
+				System.out.println(fromRow + " " + fromCol + " " + toRow + " " + toCol);
+				writeMove = false;
+				readMoves();
+			} catch (IOException ex) {
+				System.out.println("Not Sent");
+			}
 		}
-			
 	}
 	
 	public void readMoves() {
@@ -210,6 +216,7 @@ public class ChessPanel extends JPanel {
 			
 			board[netFromRow][netFromCol].doClick();
 			board[netToRow][netToCol].doClick();
+			writeMove = true;
 		} catch (IOException ex) {
 			System.out.println("Not read");
 		}
@@ -289,9 +296,9 @@ public class ChessPanel extends JPanel {
 								getScaledImage(pawnW.getImage()
 								,50, 50));
 						north.remove(playerTurn);
-						playerTurn =
-								new JLabel("It is "+ 
-						model.player +"'s turn.");
+						//playerTurn =
+						//		new JLabel("It is "+ 
+						//model.player +"'s turn.");
 						north.add(playerTurn, BorderLayout.CENTER);
 						north.repaint();
 						north.revalidate();
@@ -420,7 +427,7 @@ public class ChessPanel extends JPanel {
 									model.move(move1);
 									model.nextPlayer();
 									pawnUpgrade();	
-								onlineMoves(fromRow, fromCol, row, col);
+								//onlineMoves(fromRow, fromCol, row, col);
 								}
 								else{
 									JOptionPane.showMessageDialog(null,
@@ -436,6 +443,8 @@ public class ChessPanel extends JPanel {
 									fromCol=col;
 								}
 							}
+							displayBoard();
+							onlineMoves(fromRow, fromCol, row, col);
 						}
 				if(model.isComplete()){
 					if(model.player ==Player.WHITE){
@@ -470,7 +479,7 @@ public class ChessPanel extends JPanel {
 				else{
 					count=0;
 				}
-
+				//onlineMoves(fromRow, fromCol, row, col);
 				
 			}
 			displayBoard();
