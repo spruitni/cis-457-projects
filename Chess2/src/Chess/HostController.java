@@ -2,7 +2,10 @@ package Chess;
 
 import java.io.*;
 import java.net.*;
-
+/*
+ * Host controller is a sub-class of controller. Since the server and client have the same game functionality, they 
+ * share the same code, except host controller will create a server socket, given a port number, that waits for a client to connect.
+ */
 public class HostController extends Controller{
     private ServerSocket serverSocket = null;
     private DataOutputStream dos;
