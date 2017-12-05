@@ -11,12 +11,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**********************************************************************
  * The Panel of the projects makes the game come to life. I put all the
@@ -53,6 +48,7 @@ public class ChessPanel extends JPanel {
 	private JButton reset;
 	private JButton undo;
 	private JButton redo;
+	private JFrame frame;
 	private int count=0;
 	private final int dimensions=8;
 	private int player1W=0;
@@ -75,7 +71,7 @@ public class ChessPanel extends JPanel {
 /**********************************************************************
  *Chess Panel instantiates all the initial JPanels, JLabels, and JButtons
  *********************************************************************/ 
-	public ChessPanel() {
+	public ChessPanel(JFrame frame) {
 		// complete this
 		center = new JPanel();
 		south = new JPanel();
@@ -85,7 +81,8 @@ public class ChessPanel extends JPanel {
 		quit = new JButton("Quit");
 		reset = new JButton("Reset");
 		undo = new JButton("Undo");
-		redo = new JButton("Redo");	
+		redo = new JButton("Redo");
+		this.frame=frame;
 		streams();
 		newBoard();
 
@@ -186,7 +183,10 @@ public class ChessPanel extends JPanel {
  	            catch(IOException ex){
  	            	System.out.println("Cannot Setup server");
  	            }  
-		}	 		
+		}
+		else if(type == JOptionPane.CANCEL_OPTION){
+			frame.dispose();
+		}
 	}
 	// Sending move coordinates to board
 	public void onlineMoves(int fromRow, int fromCol, int toRow, int toCol) {
@@ -370,16 +370,20 @@ public class ChessPanel extends JPanel {
 			}
 			else if(event.getSource() == quit) {
 				try {
-					playerQuit("quit" + "\n");
-					dos.close();
+
 					br.close();
-					serverSocket.close();
+					dos.close();
 					clientSocket.close();
-					
-				} catch (IOException e){
-					
+					try {
+						serverSocket.close();
+					}catch(NullPointerException ex){
+
+					}
+				}catch(IOException ex){
+
 				}
-				System.exit(1);
+					frame.dispose();
+
 				}
 			else if(event.getSource()==reset) {
 				resetBoard();

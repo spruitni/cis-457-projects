@@ -7,13 +7,15 @@ import javax.swing.JFrame;
  * @version (3/22/2016)
  *********************************************************************/ 
 public class ChessGUI {
+	private ChessPanel panel;
+	private JFrame frame;
 
 	public ChessGUI() {
 		
 		JFrame frame = new JFrame("Chess Game");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		ChessPanel panel = new ChessPanel();
+		panel = new ChessPanel(frame);
 		frame.getContentPane().add(panel);
 
 		frame.setSize(650,740);
@@ -21,5 +23,4 @@ public class ChessGUI {
 		frame.setVisible(true);
 		
 	}
-	
 }
