@@ -11,7 +11,10 @@ import java.net.*;
 import java.util.*;
 import java.text.*;
 import java.lang.*;
-
+/*
+ * This class keeps track of the logic of the Hangman game. It is usd by both a client or server. When buttons are pushed,
+ * I/O streams are sent to the other player and either letters, a word, or a message is read, and the appropriate action is taken.
+ */
 public abstract class Controller{
     private int score;
     private int opponentScore;
@@ -36,24 +39,29 @@ public abstract class Controller{
             view.setToWait();
         }
     }
-
+    
+    //Refreshes the UI
     private void updateGUI(){
         view.setRemainingLabel(model.getnumberOfGuesses());
         view.setWordLabel(model.getWordProgress());
     }
 
+    //Resets the UI for a new game
     private void resetGUI(){
         view.clearRemaining();
         view.setWordLabel("");
         view.setToWait();
     }
 
+    //Listens for a message from the other player by reading in a line from the buffered reader
     public void listen(BufferedReader br, DataOutputStream dos){
         boolean cont = true;
         while(cont){
             try{
                 String message = br.readLine();
                 String[] messageParts = message.split("\\s");
+                
+                //The other player sent a letter, so update the UI and model accordingly
                 if(messageParts[0].equals("Letter")){
                     model.guessLetter(messageParts[1].charAt(0));
                     if(model.wordGuessed()){
@@ -76,6 +84,8 @@ public abstract class Controller{
                         updateGUI();
                     }
                 }
+                
+                //The other player guessed the word, so update the UI and update the scores
                 else if(messageParts[0].equals("Guess")){
                     if(model.guessWord(messageParts[1])){
                         opponentScore++;
@@ -89,17 +99,23 @@ public abstract class Controller{
                         updateGUI();
                     }
                 }
+                
+                //The other player set the word to be guessed
                 else if(messageParts[0].equals("Set")){
                     view.setAsGuesser();
                     model.newGame(messageParts[1], Difficulty.EASY);
                     updateGUI();
                 }
+                
+                //The other player quit the game
                 else if(messageParts[0].equals("quit")){
                     view.quitMessage(score, opponentScore);
                     view.dispose();
                     dos.writeBytes("quitListening");
                     cont = false;
                 }
+                
+                //Cleans up the reader from the other user
                 else if(messageParts[0].equals("quitListening")){
                     cont = false;
                 }
@@ -117,9 +133,14 @@ public abstract class Controller{
         //Listen for button clicked, etc.
         actionListener = new ActionListener(){
             public void actionPerformed(ActionEvent e){
+                
+                //Listen for each of the letters to be pushed
                 for(JButton button : view.getLetterButtons()){
                     if(e.getSource() == button){
                         button.setEnabled(false);
+                        
+                        //Checks to see if the letter is in the word, and updates the UI and model, and sends the info to the 
+                        //other player
                         String letter = button.getText();
                         try{
                             model.guessLetter(letter.charAt(0));
@@ -151,6 +172,8 @@ public abstract class Controller{
                         break;
                     }
                 }
+                
+                //Guess button is clicked, update the UI and model, and send the info to the other player
                 if(e.getSource() == view.getGuessWordButton()){
                     String word = view.getGuessWord();
                     view.clearGuessWord();
@@ -172,6 +195,8 @@ public abstract class Controller{
                         System.out.println("Error guessing word");
                     }
                 }
+                
+                //Set word button is clicked, update the UI, and send the info to the other player
                 else if(e.getSource() == view.getSetWordButton()){
                     try{
                         String word = view.getSetWord();
@@ -190,6 +215,8 @@ public abstract class Controller{
                         System.out.println("Error setting word");
                     }
                 }
+                
+                //Quit button is clicked, notifies the other player, and closes the game
                 else if(e.getSource() == view.getQuitButton()){
                     try{
                         view.quitMessage(score, opponentScore);
