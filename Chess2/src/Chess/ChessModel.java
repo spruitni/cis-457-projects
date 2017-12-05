@@ -19,6 +19,7 @@ public class ChessModel implements IChessModel {
     private Player white = Player.WHITE;
     private Player black = Player.BLACK;
     public Player player=white;
+    public Player userPlayer = white;
     public Move moves[] = new Move[1000000];
     public IChessPiece killedPieces[] = new IChessPiece[1000000];
     public int typeOfMove[] = new int[1000000];
@@ -115,11 +116,25 @@ public class ChessModel implements IChessModel {
                 .isValidMove(move, board));
     }
     /**********************************************************************
+     * The is Valid move checks if the enter move is valid. Though it is
+     * overridden in the individual isValidMove methods in each piece.
+     * @param move; The initial move entered form the panel.
+     * @param inPlayer; The user to compare to the turn.
+     * @return true; If the move is valid.
+     *********************************************************************/
+    public boolean isValidMove(Move move, Player inPlayer){
+        if(this.player == inPlayer){
+            return isValidMove(move);
+        }
+        return false;
+    }
+    /**********************************************************************
      * The next Player changes the turn.
      *********************************************************************/
     public void nextPlayer(){
         player=player.next();
     }
+
     /**********************************************************************
      *Clear board resets the board to a new game.
      *********************************************************************/
