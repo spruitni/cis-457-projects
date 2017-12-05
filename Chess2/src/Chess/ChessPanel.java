@@ -205,10 +205,26 @@ public class ChessPanel extends JPanel {
 		}
 	}
 	
-	public void readMoves() {
+	public void playerQuit(String quit) {
 		
 		try {
+			dos.writeBytes(quit);
+		} catch (IOException ex) {
+			System.out.println("Not Sent");
+		}
+		
+	}
+	
+	public void readMoves() {
+
+		try {
 			String[] coordinates = br.readLine().split("\\s");
+			
+			if (coordinates[0].equals("quit")){
+				
+				System.exit(1);
+				
+			}
 			
 			int netFromRow = Integer.parseInt(coordinates[0]);
 			int netFromCol = Integer.parseInt(coordinates[1]);
@@ -220,6 +236,7 @@ public class ChessPanel extends JPanel {
 			writeMove = true;
 		} catch (IOException ex) {
 			System.out.println("Not read");
+			System.exit(1);
 		}
 		
 	}
@@ -535,7 +552,7 @@ public class ChessPanel extends JPanel {
 							}
 							if(noneLeft == true ){
 								JOptionPane.showMessageDialog(null,""
-										+ "You have bo piece available "
+										+ "You have no piece available "
 										+ "so you get an extra Queen");
 								model.pawnUpgrade(0,
 										0, col);

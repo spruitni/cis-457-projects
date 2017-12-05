@@ -9,7 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.ArrayList;
-
+/*
+ * This is the GUI class that holds all the components for the Hangman game.
+ */
 public class View extends JFrame{
 
     private final int ALPHA_LENGTH = 26;
@@ -21,6 +23,9 @@ public class View extends JFrame{
     private Font font;
     private boolean isHost;
 
+    /*
+     * Sets up the components, positions, sizes, and fonts 
+     */
     public View(boolean isHost){
 
         //Crete components
@@ -111,9 +116,8 @@ public class View extends JFrame{
         frameSetup();
     }
 
-    /*
-     * Sets up the frame size, title, etc.
-     */
+    
+    //Sets up the frame size, title, etc.
     private void frameSetup(){
         this.setTitle("Hangman");
         this.add(mainPanel);
@@ -143,33 +147,45 @@ public class View extends JFrame{
         return gbc;
     }
 
+    //Displays an error popup
     public void displayError(String errorMessage){
         JLabel error = new JLabel(errorMessage);
         error.setFont(font);
         JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
-
+    
+    //Displays that the guesser won
     public void displayGuesserWin(String word){
         JLabel message = new JLabel("Congratulations, you guessed: " + word);
         message.setFont(font);
         JOptionPane.showMessageDialog(this, message, "You Win!", JOptionPane.PLAIN_MESSAGE);
     }
+    
+    //Displays that the guesser lost
     public void displayGuesserLose(String word){
         JLabel message = new JLabel("Sorry, you lost. Correct word: " + word);
         message.setFont(font);
         JOptionPane.showMessageDialog(this, message, "You Lose!", JOptionPane.PLAIN_MESSAGE);
     }
+    
+    //Displays that the host won
     public void displayHostWin(String word){
         JLabel message = new JLabel("Congratulations, your opponent could not guess: " + word);
         message.setFont(font);
         JOptionPane.showMessageDialog(this, message, "You Win!", JOptionPane.PLAIN_MESSAGE);
     }
+    
+    //Displays that the host lost
     public void displayHostLose(String word){
         JLabel message = new JLabel("Sorry, you lost. Your opponent guessed: " + word);
         message.setFont(font);
         JOptionPane.showMessageDialog(this, message, "You Lose!", JOptionPane.PLAIN_MESSAGE);
     }
 
+    
+    /*
+     * Setters and Getters
+     */
     public void setScore(int score){
         if(this.isHost){
             player1Score.setText("Score: " + Integer.toString(score));

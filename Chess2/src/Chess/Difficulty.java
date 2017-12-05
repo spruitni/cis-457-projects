@@ -1,5 +1,8 @@
 package Chess;
 
+/*
+ * The difficulty levels, based on number of guesses allowed
+ */
 public enum Difficulty{
     VERY_EASY(10),
     EASY(9),

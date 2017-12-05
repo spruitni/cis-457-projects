@@ -2,7 +2,11 @@ package Chess;
 
 import java.io.*;
 import java.net.*;
-
+/*
+ * Connect controller is a sub-class of controller. Since the server and client have the same game functionality, they 
+ * share the same code, except connect controller will create a socket that connects to the server socket given an IP
+ * address and port number.
+ */
 public class ConnectController extends Controller{
     private Socket socket;
     private DataOutputStream dos;

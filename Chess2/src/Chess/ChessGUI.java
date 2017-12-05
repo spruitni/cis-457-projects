@@ -10,9 +10,10 @@ public class ChessGUI {
 	private ChessPanel panel;
 	private JFrame frame;
 
-	public ChessGUI (){
-		frame = new JFrame("Chess Game");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	public ChessGUI() {
+		
+		JFrame frame = new JFrame("Chess Game");
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		panel = new ChessPanel(frame);
 		frame.getContentPane().add(panel);
@@ -20,6 +21,6 @@ public class ChessGUI {
 		frame.setSize(650,740);
 		frame.setResizable(false);
 		frame.setVisible(true);
+		
 	}
-
 }
