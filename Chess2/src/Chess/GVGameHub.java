@@ -49,36 +49,32 @@ public class GVGameHub{
     public void setUp(String game){
         boolean cont = true;
         do{
-            String hostOrClient = getUserInput("Would you like to be a server(s) or client(c)? ");
-            if(hostOrClient.equals("SERVER") || hostOrClient.equals("S")){
-                try{
-                    int port = Integer.parseInt(getUserInput("Enter your listening port number: "));
-                    if(game.equals("CHESS")){
-                        new ChessGUI(true, port, null);
+           if(game.equals("CHESS")){
+                        new ChessGUI();
+                        cont = false;
+            }
+            else{
+                String hostOrClient = getUserInput("Would you like to be a server(s) or client(c)? ");
+                if(hostOrClient.equals("SERVER") || hostOrClient.equals("S")){
+                    try{
+                        int port = Integer.parseInt(getUserInput("Enter your listening port number: "));
+                        new HostController(port);
+                    
+                    }
+                    catch(NumberFormatException ex){
+                        System.out.println("Invalid port");
+                    }
+                }
+                else if(hostOrClient.equals("CLIENT") || hostOrClient.equals("C")){
+                    try{
+                        String ipAddress = getUserInput("Enter host IP address: ");
+                        int port = Integer.parseInt(getUserInput("Enter host port number: "));
+                        new ConnectController(ipAddress, port);
                         cont = false;
                     }
-                    else if(game.equals("HANGMAN")){
-                        new HostController(port);
+                    catch(NumberFormatException ex){
+                        System.out.println("Invalid host port");
                     }
-                }
-                catch(NumberFormatException ex){
-                    System.out.println("Invalid port");
-                }
-            }
-            else if(hostOrClient.equals("CLIENT") || hostOrClient.equals("C")){
-                try{
-                    String ipAddress = getUserInput("Enter host IP address: ");
-                    int port = Integer.parseInt(getUserInput("Enter host port number: "));
-                    if(game.equals("CHESS")){
-                        new ChessGUI(false, port, ipAddress);
-                    }
-                    else if(game.equals("HANGMAN")){
-                        new ConnectController(ipAddress, port);
-                    }
-                    cont = false;
-                }
-                catch(NumberFormatException ex){
-                    System.out.println("Invalid host port");
                 }
             }
         }while(cont);
