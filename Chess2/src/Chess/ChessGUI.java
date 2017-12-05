@@ -21,7 +21,7 @@ public class ChessGUI {
 
 		panel = new ChessPanel(frame);
 		frame.getContentPane().add(panel);
-		
+
 		frame.setSize(650,740);
 		frame.setResizable(false);
 		frame.setVisible(true);

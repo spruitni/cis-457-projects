@@ -61,6 +61,7 @@ public class GVGameHub{
                     try{
                         int port = Integer.parseInt(getUserInput("Enter your listening port number: "));
                         new HostController(port);
+                        cont = false;
                     
                     }
                     catch(NumberFormatException ex){
