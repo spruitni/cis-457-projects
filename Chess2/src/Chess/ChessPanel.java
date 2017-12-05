@@ -46,7 +46,7 @@ public class ChessPanel extends JPanel {
 	private JLabel playerTurn;
 	private JButton quit;
 	private JButton reset;
-	private JButton undo;
+	private JButton connect;
 	private JButton redo;
 	private JFrame frame;
 	private int count=0;
@@ -54,7 +54,6 @@ public class ChessPanel extends JPanel {
 	private int player1W=0;
 	private int player2W=0;
 	private int fromRow, fromCol;
-	private int sFromRow, sFromCol, sToRow, sToCol;
 	private boolean firstClick = true;
 	private DataOutputStream dos;
 	private BufferedReader br;
@@ -62,7 +61,6 @@ public class ChessPanel extends JPanel {
 	private Socket clientSocket;
 	private boolean isHost;
 	private boolean writeMove;
-	private boolean performSend = false;
 
 	// declare other instance variables as needed
 	
@@ -79,9 +77,9 @@ public class ChessPanel extends JPanel {
 		player1 = new JLabel("White wins: "+player1W);
 		player2 = new JLabel("Black wins: "+player2W);
 		quit = new JButton("Quit");
-		reset = new JButton("Reset");
-		undo = new JButton("Undo");
-		redo = new JButton("Redo");
+		//reset = new JButton("Reset");
+		connect = new JButton("Connect");
+		//redo = new JButton("Redo");
 		this.frame=frame;
 		streams();
 		newBoard();
@@ -94,10 +92,10 @@ public class ChessPanel extends JPanel {
 	private void newBoard(){
 		model = new ChessModel();
 		quit.addActionListener(buttonListener);
-		reset.addActionListener(buttonListener);
-		undo.addActionListener(buttonListener);
-		redo.addActionListener(buttonListener);
-		reset.setPreferredSize(new Dimension(15, 25));
+		//reset.addActionListener(buttonListener);
+		//connect.addActionListener(buttonListener);
+		//redo.addActionListener(buttonListener);
+		//reset.setPreferredSize(new Dimension(15, 25));
 		center.setLayout(new GridLayout(dimensions, dimensions));
 		board = new JButton[dimensions][dimensions];
 		south.setLayout(new BorderLayout(dimensions, dimensions));
@@ -121,17 +119,23 @@ public class ChessPanel extends JPanel {
 				center.add(board[row][col]);
 			}
 		//playerTurn = new JLabel("It is "+ model.player +"'s turn.");
-		north.add(redo, BorderLayout.EAST);
-		north.add(undo, BorderLayout.WEST);
+		//north.add(redo, BorderLayout.EAST);
+//		north.add(connect, BorderLayout.WEST);
 		north.add(playerTurn, BorderLayout.CENTER);
 		south.add(player1, BorderLayout.WEST);
 		south.add(player2, BorderLayout.EAST);
 		south.add(quit , BorderLayout.CENTER);
-		south.add(reset, BorderLayout.SOUTH);
+		//south.add(reset, BorderLayout.SOUTH);
+		if(!isHost){
+			model.userPlayer=black;
+			connect.addActionListener(buttonListener);
+			north.add(connect, BorderLayout.WEST);
+		}
 		add(north, BorderLayout.NORTH);
 		add(center, BorderLayout.CENTER);
 		add(south, BorderLayout.SOUTH);
 		displayBoard();
+
 	}
 /**********************************************************************
  *Reset Board resets the Board display and resets the model.
@@ -153,12 +157,13 @@ public class ChessPanel extends JPanel {
 *Steams sets up the tcp connection with the opponent.
 *********************************************************************/
 	public void streams() {
-		int type= JOptionPane.showConfirmDialog(null,"Would you like to host a game?", null, JOptionPane.YES_NO_OPTION);
-
+		int type = 0;
+			type = JOptionPane.showConfirmDialog(null, "Would you like to host a game?", null, JOptionPane.YES_NO_OPTION);
 		if (type == JOptionPane.YES_OPTION) {
 			try {
 					playerTurn = new JLabel("Host Player: White");
 					isHost = true;
+
 	            	serverSocket = new ServerSocket(5050);
 	            	clientSocket = serverSocket.accept();
 	            	System.out.println("Connection created");
@@ -173,10 +178,11 @@ public class ChessPanel extends JPanel {
 		}
 		else if(type == JOptionPane.NO_OPTION) {
 			try {
-				playerTurn = new JLabel("Client Player: Black");
-				isHost = false;
- 		    	String ipAddress = JOptionPane.showInputDialog("Enter Host IP");
- 	            	clientSocket = new Socket(ipAddress, 5050);
+					playerTurn = new JLabel("Client Player: Black");
+					isHost = false;
+					String ipAddress = "";
+					ipAddress = JOptionPane.showInputDialog("Enter Host IP");
+					clientSocket = new Socket(ipAddress, 5050);
  	            	System.out.println("Connection created");
  	            	dos = new DataOutputStream(clientSocket.getOutputStream());
  	            	br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -184,10 +190,11 @@ public class ChessPanel extends JPanel {
  	            }
  	            catch(IOException ex){
  	            	System.out.println("Cannot Setup server");
+ 	            	System.exit(1);
  	            }  
 		}
-		else if(type == JOptionPane.CANCEL_OPTION){
-			frame.dispose();
+		else if(type == JOptionPane.CLOSED_OPTION){
+			System.exit(0);
 		}
 	}
  /**********************************************************************
@@ -198,6 +205,7 @@ public class ChessPanel extends JPanel {
 	public void onlineMoves(int fromRow, int fromCol, int toRow, int toCol) {
 		//board[1][1].doClick();
 		//board[2][1].doClick();
+		displayBoard();
 		if (writeMove) {
 			try {
 			
@@ -247,7 +255,6 @@ public class ChessPanel extends JPanel {
 
 		try {
 			String[] coordinates = br.readLine().split("\\s");
-			
 			if (coordinates[0].equals("quit")){
 				quit();
 				frame.dispose();
@@ -258,10 +265,17 @@ public class ChessPanel extends JPanel {
 				int netFromCol = Integer.parseInt(coordinates[1]);
 				int netToRow = Integer.parseInt(coordinates[2]);
 				int netToCol = Integer.parseInt(coordinates[3]);
-
+				if(isHost)
+					model.userPlayer=black;
+				else
+					model.userPlayer=white;
 				board[netFromRow][netFromCol].doClick();
 				board[netToRow][netToCol].doClick();
 				writeMove = true;
+				if(isHost)
+					model.userPlayer=white;
+				else
+					model.userPlayer=black;
 			}
 		} catch (IOException ex) {
 			System.out.println("Not read");
@@ -380,39 +394,39 @@ public class ChessPanel extends JPanel {
 		public void actionPerformed(ActionEvent event) {
 
 			// retrieve move and execute
-			if(event.getSource() == undo){
+			if(event.getSource() == connect){
 				
 				readMoves();
 
 			}
 			// send the move
-			else if(event.getSource() == redo){
-				
-				int fRow = model.moves[model.getCounter()-1].fromRow;
-                int fCol = model.moves[model.getCounter()-1].fromColumn;
-                int tRow = model.moves[model.getCounter()-1].toRow;
-                int tCol = model.moves[model.getCounter()-1].toColumn;
-                
-                
-				
-				
-			}
+//			else if(event.getSource() == redo){
+//
+//				int fRow = model.moves[model.getCounter()-1].fromRow;
+//                int fCol = model.moves[model.getCounter()-1].fromColumn;
+//                int tRow = model.moves[model.getCounter()-1].toRow;
+//                int tCol = model.moves[model.getCounter()-1].toColumn;
+//
+//
+//
+//
+//			}
 			else if(event.getSource() == quit) {
 				playerQuit();
 				quit();
-					frame.dispose();
+				frame.dispose();
 
 				}
-			else if(event.getSource()==reset) {
-				resetBoard();
-			}
+//			else if(event.getSource()==reset) {
+//				resetBoard();
+//			}
 			else if(firstClick==true){
 				for(int row=0; row<dimensions; row++)
 					for(int col=0; col<dimensions; col++)
 						if(event.getSource() == board[row][col]){
 							if(model.pieceAt(row, col)!=null&&
 									model.pieceAt(row, col).player()
-									==model.player){
+											==model.player){
 								firstClick=false;
 							}
 							fromRow=row;
@@ -427,62 +441,62 @@ public class ChessPanel extends JPanel {
 						if(event.getSource() == board[row][col]){
 							Move move1=(new Move(fromRow, fromCol
 									, row, col));
-							if(model.isValidMove(move1)){
+							if(model.isValidMove(move1, model.userPlayer)){
 								if(!model.causesCheck(move1)){
 									model.killedPieces
-									[model.getCounter()]=
-									model.pieceAt(row, col);
+											[model.getCounter()]=
+											model.pieceAt(row, col);
 									model.moves[model.getCounter()]
 											=move1;
 									if(model.isCastle(move1)){
 										model.typeOfMove
-										[model.getCounter()]=2;
+												[model.getCounter()]=2;
 										if(move1.toColumn==1)
 											model.move(
-											new Move(
-											move1.fromRow,0,
-											move1.fromRow,2));
+													new Move(
+															move1.fromRow,0,
+															move1.fromRow,2));
 										if(move1.toColumn==5)
 											model.move(
-											new Move(move1.fromRow,
-													7,move1.fromRow,4));
+													new Move(move1.fromRow,
+															7,move1.fromRow,4));
 									}
 									else if(model.isEnPassant(move1)){
 										model.typeOfMove
-										[model.getCounter()]=3;
+												[model.getCounter()]=3;
 										if(move1.toRow==2){
 											model.killedPieces
-											[model.getCounter()]
+													[model.getCounter()]
 													=model.pieceAt(
-													move1.toRow+1, 
+													move1.toRow+1,
 													move1.toColumn);
 											model.removePiece(
-													move1.toRow+1, 
+													move1.toRow+1,
 													move1.toColumn);
 										}
 										if(move1.toRow==5){
 											model.removePiece(
-												move1.toRow-1, 
-												move1.toColumn);
+													move1.toRow-1,
+													move1.toColumn);
 										}
 									}
 									else{
 										model.typeOfMove
-										[model.getCounter()]=1;
+												[model.getCounter()]=1;
 									}
 
 									model.setCounter
-									(model.getCounter()+1);
+											(model.getCounter()+1);
 									model.setHasMoved(move1, true);
 									model.move(move1);
 									model.nextPlayer();
-									pawnUpgrade();	
-								onlineMoves(fromRow, fromCol, row, col);
+									pawnUpgrade();
+									onlineMoves(fromRow, fromCol, row, col);
 								}
 								else{
 									JOptionPane.showMessageDialog(null,
 											model.player+
-											" would be in Check");
+													" would be in Check");
 								}
 							}
 							else if(model.pieceAt(row, col) !=null){
@@ -493,10 +507,10 @@ public class ChessPanel extends JPanel {
 									fromCol=col;
 								}
 							}
-							//sFromRow = fromRow;
-							//sFromCol = fromCol;
-							//sToRow = row;
-							//sToCol = col;
+//							sFromRow = fromRow;
+//							sFromCol = fromCol;
+//							sToRow = row;
+//							sToCol = col;
 							//performSend = true;
 							//onlineMoves(fromRow, fromCol, row, col);
 						}
@@ -512,7 +526,7 @@ public class ChessPanel extends JPanel {
 					int reply= JOptionPane.showConfirmDialog(null,
 							model.player+" is now in Checkmate. "
 									+"\n Would you like to play again?",
-									null, JOptionPane.YES_NO_OPTION);
+							null, JOptionPane.YES_NO_OPTION);
 
 					if (reply == JOptionPane.YES_OPTION) {
 						resetBoard();
@@ -534,13 +548,13 @@ public class ChessPanel extends JPanel {
 					count=0;
 				}
 				//onlineMoves(fromRow, fromCol, row, col);
-				
+				displayBoard();
 			}
-			displayBoard();
 		}
 
 	}
-/**********************************************************************
+
+/**************************************************
  * PawnUpgrade checks if a pawn has made it across the board then 
  * displays a message asking for what new piece the current player
  * would want.
